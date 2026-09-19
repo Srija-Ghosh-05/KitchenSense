@@ -13,7 +13,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aws.sdk.version>2.25.11</aws.sdk.version>
+        <aws.sdk.version>2.26.12</aws.sdk.version>
         <aws.lambda.core.version>1.2.3</aws.lambda.core.version>
         <aws.lambda.events.version>3.11.3</aws.lambda.events.version>
         <jackson.version>2.15.2</jackson.version>

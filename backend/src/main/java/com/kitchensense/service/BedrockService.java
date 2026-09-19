@@ -3,11 +3,13 @@ package com.kitchensense.service;
 import com.kitchensense.model.FoodItem;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelRequest;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelResponse;
-import software.amazon.awssdk.core.SdkBytes;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
+
+import software.amazon.awssdk.services.bedrockruntime.model.Message;
+import software.amazon.awssdk.services.bedrockruntime.model.ConversationRole;
+import software.amazon.awssdk.services.bedrockruntime.model.ContentBlock;
+import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
+import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -16,8 +18,8 @@ import java.util.stream.Collectors;
 
 public class BedrockService {
 
-    // Using Amazon Titan Text Express — it is available in ap-south-1 (Mumbai) region and is free tier eligible. Claude models require separate access requests. Titan is sufficient for recipe suggestions and kitchen chat.
-    private static final String MODEL_ID = "amazon.titan-text-express-v1";
+    // Using Amazon Nova Micro 1.0.
+    private static final String MODEL_ID = "arn:aws:bedrock:ap-south-1:917246556061:inference-profile/apac.amazon.nova-micro-v1:0";
 
     private final BedrockRuntimeClient bedrockClient;
     // Shared instance — ObjectMapper is thread-safe and expensive to create. Reuse across calls.
@@ -45,45 +47,20 @@ public class BedrockService {
     // maxTokenCount 512 is enough for a recipe suggestion without being wasteful.
     private String invokeModel(String prompt) {
         try {
-            // Build request body using ObjectMapper — handles all escaping automatically
-            Map<String, Object> requestMap = new HashMap<>();
-            requestMap.put("inputText", prompt);
-            
-            Map<String, Object> config = new HashMap<>();
-            config.put("maxTokenCount", 512);
-            config.put("temperature", 0.7);
-            config.put("topP", 0.9);
-            requestMap.put("textGenerationConfig", config);
-            
-            String requestBody = objectMapper.writeValueAsString(requestMap);
-
-            InvokeModelRequest request = InvokeModelRequest.builder()
-                    .modelId(MODEL_ID)
-                    .contentType("application/json")
-                    .accept("application/json")
-                    .body(SdkBytes.fromUtf8String(requestBody))
+            Message message = Message.builder()
+                    .role(ConversationRole.USER)
+                    .content(ContentBlock.fromText(prompt))
                     .build();
 
-            InvokeModelResponse response = bedrockClient.invokeModel(request);
+            ConverseRequest request = ConverseRequest.builder()
+                    .modelId(MODEL_ID)
+                    .messages(message)
+                    .build();
 
-            // Titan Text response schema:
-            // {
-            //   "results": [
-            //     { "outputText": "the generated text" }
-            //   ]
-            // }
-            // We read results[0].outputText to get the actual text response.
-            String responseJson = response.body().asUtf8String();
-            JsonNode rootNode = objectMapper.readTree(responseJson);
-            JsonNode resultsArray = rootNode.get("results");
+            ConverseResponse response = bedrockClient.converse(request);
 
-            if (resultsArray != null && resultsArray.isArray() && resultsArray.size() > 0) {
-                JsonNode firstResult = resultsArray.get(0);
-                if (firstResult.has("outputText")) {
-                    return firstResult.get("outputText").asText();
-                }
-            }
-            return "Sorry, I could not generate a suggestion right now. Please try again.";
+            return response.output().message().content().get(0).text();
+
         } catch (Exception e) {
             System.err.println("Error invoking Bedrock model: " + e.getMessage());
             return "Sorry, I could not generate a suggestion right now. Please try again.";
