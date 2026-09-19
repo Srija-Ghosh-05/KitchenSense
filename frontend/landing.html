@@ -1,0 +1,2913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>KitchenSense — Smart Food Expiry Tracker for Indian Kitchens</title>
+
+    <!-- Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =========================================================
+           ROOT
+        ========================================================= */
+
+        :root {
+            --forest: #174d38;
+            --forest-2: #216447;
+            --mint: #67c79a;
+            --mint-light: #dff5e9;
+            --mint-soft: #f1faf5;
+
+            --cream: #fbfaf6;
+            --cream-2: #f5f4ee;
+
+            --text: #16251e;
+            --muted: #66736d;
+
+            --white: #ffffff;
+
+            --red: #ef5b5b;
+            --amber: #e7a72d;
+            --green: #37b878;
+
+            --border: rgba(23, 77, 56, 0.10);
+
+            --shadow-sm:
+                0 8px 25px rgba(22, 48, 36, 0.06);
+
+            --shadow-md:
+                0 18px 50px rgba(22, 48, 36, 0.10);
+
+            --shadow-lg:
+                0 30px 80px rgba(22, 48, 36, 0.15);
+
+            --radius-sm: 14px;
+            --radius-md: 22px;
+            --radius-lg: 32px;
+
+            --ease: cubic-bezier(.22, 1, .36, 1);
+        }
+
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            color: var(--text);
+            background: var(--cream);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font: inherit;
+        }
+
+
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+        .container {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 13px;
+
+            border-radius: 999px;
+
+            background: rgba(103, 199, 154, 0.14);
+            border: 1px solid rgba(103, 199, 154, 0.25);
+
+            color: var(--forest);
+
+            font-size: 12px;
+            font-weight: 700;
+
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--mint);
+
+            box-shadow: 0 0 0 5px rgba(103,199,154,.12);
+        }
+
+        .section {
+            position: relative;
+            padding: 120px 0;
+        }
+
+        .section-heading {
+            max-width: 720px;
+            margin: 0 auto 65px;
+            text-align: center;
+        }
+
+        .section-heading h2 {
+            margin-top: 18px;
+
+            font-size: clamp(38px, 5vw, 58px);
+            line-height: 1.05;
+            letter-spacing: -0.045em;
+
+            color: var(--forest);
+        }
+
+        .section-heading p {
+            max-width: 600px;
+            margin: 18px auto 0;
+
+            color: var(--muted);
+
+            font-size: 17px;
+            line-height: 1.7;
+        }
+        .section-kicker {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 13px;
+            border-radius: 999px;
+
+            color: #b7f0d0;
+            background: rgba(183, 240, 208, 0.10);
+            border: 1px solid rgba(183, 240, 208, 0.28);
+
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+
+
+        /* =========================================================
+           NAVBAR
+        ========================================================= */
+
+        .navbar {
+            position: fixed;
+            z-index: 1000;
+
+            top: 18px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width: min(1120px, calc(100% - 30px));
+            height: 64px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 10px 0 20px;
+
+            background: rgba(255,255,255,.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border: 1px solid rgba(23,77,56,.10);
+
+            border-radius: 18px;
+
+            box-shadow: 0 10px 40px rgba(20,50,37,.08);
+
+            transition: .3s ease;
+        }
+
+        .navbar.scrolled {
+            top: 10px;
+
+            box-shadow:
+                0 15px 50px rgba(20,50,37,.13);
+        }
+
+        .navbar-logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-login {
+            padding: 10px 17px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            color: var(--forest);
+
+            border-radius: 11px;
+
+            transition: .25s ease;
+        }
+
+        .nav-login:hover {
+            background: var(--mint-soft);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            border: 0;
+            cursor: pointer;
+
+            font-weight: 700;
+            font-size: 14px;
+
+            padding: 12px 19px;
+
+            border-radius: 12px;
+
+            transition:
+                transform .25s var(--ease),
+                box-shadow .25s ease,
+                background .25s ease;
+        }
+
+        .btn-primary {
+            color: white;
+            background: var(--forest);
+
+            box-shadow:
+                0 8px 20px rgba(23,77,56,.18);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+
+            background: #103d2c;
+
+            box-shadow:
+                0 13px 30px rgba(23,77,56,.25);
+        }
+
+        .btn-large {
+            padding: 16px 23px;
+            border-radius: 14px;
+            font-size: 15px;
+        }
+
+
+        /* =========================================================
+           HERO
+        ========================================================= */
+
+        .hero {
+            min-height: 100vh;
+
+            padding-top: 145px;
+            padding-bottom: 90px;
+
+            position: relative;
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 10% 25%,
+                    rgba(103,199,154,.25),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(220,236,190,.45),
+                    transparent 28%
+                ),
+                var(--cream);
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 650px;
+            height: 650px;
+
+            right: -260px;
+            bottom: -300px;
+
+            background: var(--mint-light);
+
+            border-radius: 50%;
+
+            filter: blur(2px);
+
+            opacity: .55;
+        }
+
+        .hero-grid {
+            position: relative;
+            z-index: 2;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, .95fr)
+                minmax(0, 1.05fr);
+
+            gap: 65px;
+
+            align-items: center;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            margin-top: 24px;
+
+            font-size: clamp(52px, 6.2vw, 82px);
+            line-height: .98;
+
+            letter-spacing: -.065em;
+
+            color: var(--forest);
+        }
+
+        .hero h1 span {
+            color: var(--mint);
+        }
+
+        .hero-description {
+            max-width: 550px;
+
+            margin-top: 25px;
+
+            color: var(--muted);
+
+            font-size: 18px;
+            line-height: 1.75;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+
+            margin-top: 34px;
+        }
+
+        .hero-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            color: var(--forest);
+
+            transition: .25s ease;
+        }
+
+        .hero-secondary:hover {
+            gap: 11px;
+        }
+
+        .trust-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+
+            margin-top: 28px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            color: #68766f;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .trust-item span {
+            color: var(--green);
+            font-weight: 800;
+        }
+
+
+        /* HERO VISUAL */
+
+        .hero-visual {
+            position: relative;
+
+            min-height: 580px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-orbit {
+            position: absolute;
+
+            width: 500px;
+            height: 500px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(103,199,154,.28),
+                    rgba(103,199,154,.08) 55%,
+                    transparent 70%
+                );
+
+            filter: blur(.2px);
+        }
+
+        .hero-orbit::before {
+            content: "";
+
+            position: absolute;
+            inset: 35px;
+
+            border: 1px dashed rgba(23,77,56,.16);
+
+            border-radius: 50%;
+        }
+
+        .hero-image {
+            position: relative;
+            z-index: 3;
+
+            width: min(480px, 90%);
+
+            filter:
+                drop-shadow(0 35px 35px rgba(24,58,42,.15));
+
+            animation:
+                heroFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes heroFloat {
+
+            0%,100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-13px) rotate(.6deg);
+            }
+        }
+
+
+        /* floating mini cards */
+
+        .float-card {
+            position: absolute;
+            z-index: 5;
+
+            padding: 14px 16px;
+
+            border-radius: 16px;
+
+            background: rgba(255,255,255,.88);
+
+            backdrop-filter: blur(15px);
+
+            border: 1px solid rgba(255,255,255,.8);
+
+            box-shadow:
+                0 18px 45px rgba(23,77,56,.12);
+
+            animation: floatCard 5s ease-in-out infinite;
+        }
+
+        .float-card.one {
+            top: 90px;
+            left: 15px;
+        }
+
+        .float-card.two {
+            right: 0;
+            bottom: 120px;
+            animation-delay: -2s;
+        }
+
+        .float-card-label {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .float-card-value {
+            margin-top: 3px;
+
+            color: var(--forest);
+
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        @keyframes floatCard {
+
+            0%,100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+
+        /* =========================================================
+           LIVE MONITOR
+        ========================================================= */
+
+        .monitor-section {
+            background: var(--white);
+        }
+
+        .monitor-wrapper {
+            position: relative;
+        }
+
+        .monitor-wrapper::before {
+            content: "";
+
+            position: absolute;
+
+            width: 400px;
+            height: 400px;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%,-50%);
+
+            background: var(--mint-light);
+
+            filter: blur(80px);
+
+            opacity: .7;
+        }
+
+        .monitor {
+            position: relative;
+            z-index: 2;
+
+            width: min(820px, 100%);
+            margin: auto;
+
+            padding: 20px;
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #173e2e,
+                    #0f2f23
+                );
+
+            box-shadow:
+                0 35px 90px rgba(23,77,56,.24);
+
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .monitor-inner {
+            padding: 24px;
+
+            border-radius: 21px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.065),
+                    rgba(255,255,255,.025)
+                );
+
+            border: 1px solid rgba(255,255,255,.09);
+        }
+
+        .monitor-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding-bottom: 20px;
+
+            border-bottom: 1px solid rgba(255,255,255,.10);
+        }
+
+        .radar {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .radar-dot {
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: #54dc98;
+
+            box-shadow:
+                0 0 0 6px rgba(84,220,152,.11);
+
+            animation: radarPulse 1.8s infinite;
+        }
+
+        @keyframes radarPulse {
+
+            0%,100% {
+                box-shadow:
+                    0 0 0 5px rgba(84,220,152,.08);
+            }
+
+            50% {
+                box-shadow:
+                    0 0 0 10px rgba(84,220,152,0);
+            }
+        }
+
+        .urgent-count {
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            background: rgba(239,91,91,.13);
+
+            border: 1px solid rgba(239,91,91,.22);
+
+            color: #ff8b8b;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .monitor-list {
+            display: grid;
+            gap: 9px;
+
+            margin-top: 18px;
+        }
+
+        .monitor-item {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0,1fr)
+                auto;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding: 15px 17px;
+
+            border-radius: 15px;
+
+            background: rgba(255,255,255,.045);
+
+            border: 1px solid rgba(255,255,255,.045);
+
+            transition: .25s ease;
+        }
+
+        .monitor-item:hover {
+            transform: translateX(4px);
+
+            background: rgba(255,255,255,.075);
+        }
+
+        .monitor-item.urgent {
+            background: rgba(239,91,91,.09);
+
+            border-color: rgba(239,91,91,.18);
+        }
+
+        .food-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            min-width: 0;
+        }
+
+        .status {
+            width: 9px;
+            height: 9px;
+
+            flex: 0 0 auto;
+
+            border-radius: 50%;
+        }
+
+        .status.red {
+            background: var(--red);
+        }
+
+        .status.amber {
+            background: var(--amber);
+        }
+
+        .status.green {
+            background: var(--green);
+        }
+
+        .food-name {
+            color: white;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .food-location {
+            margin-left: 8px;
+
+            padding: 4px 7px;
+
+            border-radius: 6px;
+
+            background: rgba(255,255,255,.08);
+
+            color: rgba(255,255,255,.60);
+
+            font-size: 10px;
+        }
+
+        .urgent-text {
+            margin-left: 7px;
+
+            color: #ff8181;
+
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .timer {
+            color: rgba(255,255,255,.88);
+
+            font-family: monospace;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+        .timer.red {
+            color: #ff8585;
+        }
+
+        .recommendation {
+            margin-top: 14px;
+
+            padding: 15px 18px;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(103,199,154,.15),
+                    rgba(103,199,154,.06)
+                );
+
+            border: 1px solid rgba(103,199,154,.15);
+
+            color: #bcebd2;
+
+            text-align: center;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+
+        /* =========================================================
+           STATS
+        ========================================================= */
+
+        .stats-section {
+            background: var(--forest);
+
+            color: white;
+
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: "";
+
+            position: absolute;
+
+            width: 500px;
+            height: 500px;
+
+            left: -250px;
+            top: -250px;
+
+            border-radius: 50%;
+
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .stats-heading h2 {
+            color: white;
+        }
+
+        .stats-heading p {
+            color: rgba(255,255,255,.62);
+        }
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3,1fr);
+
+            gap: 18px;
+        }
+
+        .stat-card {
+            position: relative;
+
+            padding: 40px 30px;
+
+            min-height: 220px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            border-radius: 24px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.105),
+                    rgba(255,255,255,.045)
+                );
+
+            border: 1px solid rgba(255,255,255,.09);
+
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 160px;
+            height: 160px;
+
+            right: -80px;
+            bottom: -80px;
+
+            border-radius: 50%;
+
+            background: rgba(103,199,154,.13);
+        }
+
+        .stat-number {
+            font-size: clamp(38px,5vw,62px);
+            font-weight: 800;
+
+            letter-spacing: -.055em;
+
+            color: white;
+        }
+
+        .stat-label {
+            max-width: 260px;
+
+            color: rgba(255,255,255,.64);
+
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+
+        /* =========================================================
+           HOW IT WORKS
+        ========================================================= */
+
+        .steps {
+            background: var(--cream);
+        }
+
+        .steps-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3,1fr);
+
+            gap: 20px;
+
+            position: relative;
+        }
+
+        .step-card {
+            position: relative;
+
+            padding: 34px 30px 32px;
+
+            background: white;
+
+            border: 1px solid var(--border);
+
+            border-radius: 25px;
+
+            box-shadow: var(--shadow-sm);
+
+            transition:
+                transform .5s var(--ease),
+                box-shadow .5s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-9px);
+
+            box-shadow: var(--shadow-md);
+        }
+
+        .step-number {
+            position: absolute;
+
+            top: 22px;
+            right: 25px;
+
+            color: var(--mint);
+
+            font-size: 54px;
+            font-weight: 800;
+        }
+
+        .step-icon {
+            width: 64px;
+            height: 64px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 27px;
+
+            border-radius: 19px;
+
+            background: var(--mint-soft);
+
+            font-size: 27px;
+
+            border: 1px solid rgba(103,199,154,.25);
+        }
+
+        .step-label {
+            color: var(--mint);
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .step-card h3 {
+            margin-top: 8px;
+
+            color: var(--forest);
+
+            font-size: 22px;
+            letter-spacing: -.025em;
+        }
+
+        .step-card p {
+            margin-top: 11px;
+
+            color: var(--muted);
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+
+        /* =========================================================
+           INDIA
+        ========================================================= */
+
+        .india-section {
+            background:
+                linear-gradient(
+                    135deg,
+                    #edf8f1,
+                    #f8f6ee
+                );
+        }
+
+        .india-layout {
+            display: grid;
+
+            grid-template-columns: .8fr 1.2fr;
+
+            gap: 70px;
+
+            align-items: center;
+        }
+
+        .india-intro h2 {
+            margin-top: 18px;
+
+            color: var(--forest);
+
+            font-size: clamp(38px,4.8vw,58px);
+            line-height: 1.04;
+
+            letter-spacing: -.05em;
+        }
+
+        .india-intro p {
+            margin-top: 18px;
+
+            color: var(--muted);
+
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .india-cards {
+            display: grid;
+            gap: 13px;
+        }
+
+        .india-card {
+            display: grid;
+
+            grid-template-columns: 8px 1fr auto;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding: 23px 25px;
+
+            background: rgba(255,255,255,.84);
+
+            border: 1px solid rgba(23,77,56,.08);
+
+            border-radius: 19px;
+
+            box-shadow: 0 8px 25px rgba(23,77,56,.045);
+
+            transition: .35s var(--ease);
+        }
+
+        .india-card:hover {
+            transform: translateX(7px);
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .india-bar {
+            width: 5px;
+            height: 55px;
+
+            border-radius: 999px;
+        }
+
+        .india-bar.green {
+            background: var(--green);
+        }
+
+        .india-bar.amber {
+            background: var(--amber);
+        }
+
+        .india-bar.red {
+            background: var(--red);
+        }
+
+        .india-title {
+            color: var(--text);
+
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .india-desc {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .india-badge {
+            padding: 6px 9px;
+
+            border-radius: 7px;
+
+            font-size: 9px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .india-badge.green {
+            background: #dcf5e7;
+            color: var(--forest);
+        }
+
+        .india-badge.amber {
+            background: #fff0cc;
+            color: #996b09;
+        }
+
+        .india-badge.red {
+            background: #ffe2e2;
+            color: #b73d3d;
+        }
+
+        .india-note {
+            margin-top: 40px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+            font-style: italic;
+        }
+
+
+        /* =========================================================
+           FEATURES
+        ========================================================= */
+
+        .features {
+            background: white;
+        }
+
+        .features-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3,1fr);
+
+            gap: 16px;
+        }
+
+        .feature {
+            position: relative;
+
+            min-height: 235px;
+
+            padding: 28px;
+
+            border-radius: 23px;
+
+            background: var(--mint-soft);
+
+            border: 1px solid rgba(23,77,56,.06);
+
+            overflow: hidden;
+
+            transition:
+                transform .45s var(--ease),
+                box-shadow .45s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-8px);
+
+            box-shadow:
+                0 20px 45px rgba(23,77,56,.10);
+        }
+
+        .feature::after {
+            content: "";
+
+            position: absolute;
+
+            width: 140px;
+            height: 140px;
+
+            right: -60px;
+            top: -60px;
+
+            border-radius: 50%;
+
+            background: rgba(103,199,154,.13);
+        }
+
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 23px;
+
+            border-radius: 15px;
+
+            background: white;
+
+            font-size: 22px;
+
+            box-shadow:
+                0 8px 18px rgba(23,77,56,.06);
+        }
+
+        .feature h3 {
+            color: var(--forest);
+
+            font-size: 17px;
+            letter-spacing: -.02em;
+        }
+
+        .feature p {
+            max-width: 300px;
+
+            margin-top: 8px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+
+        /* =========================================================
+           FINAL CTA
+        ========================================================= */
+
+        .cta {
+            position: relative;
+
+            padding: 130px 0 100px;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 50% 120%,
+                    rgba(103,199,154,.28),
+                    transparent 42%
+                ),
+                var(--forest);
+
+            color: white;
+
+            text-align: center;
+        }
+
+        .cta::before {
+            content: "";
+
+            position: absolute;
+
+            width: 650px;
+            height: 650px;
+
+            left: 50%;
+            top: 48%;
+
+            transform: translate(-50%,-50%);
+
+            border-radius: 50%;
+
+            border: 1px solid rgba(255,255,255,.07);
+
+            box-shadow:
+                0 0 0 70px rgba(255,255,255,.015),
+                0 0 0 140px rgba(255,255,255,.01);
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 3;
+
+            max-width: 760px;
+            margin: auto;
+        }
+
+        .cta h2 {
+            font-size: clamp(48px,7vw,82px);
+
+            line-height: .98;
+
+            letter-spacing: -.065em;
+        }
+
+        .cta h2 span {
+            color: var(--mint);
+        }
+
+        .cta-subtext {
+            max-width: 600px;
+
+            margin: 20px auto 30px;
+
+            color: rgba(255,255,255,.68);
+
+            font-size: 17px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+
+            padding: 17px 25px;
+
+            border-radius: 14px;
+
+            background: white;
+
+            color: var(--forest);
+
+            font-size: 15px;
+            font-weight: 800;
+
+            box-shadow:
+                0 15px 35px rgba(0,0,0,.15);
+
+            transition: .3s var(--ease);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.02);
+
+            box-shadow:
+                0 20px 45px rgba(0,0,0,.22);
+        }
+
+        .guarantee {
+            margin-top: 15px;
+
+            color: rgba(255,255,255,.46);
+
+            font-size: 11px;
+        }
+
+        .characters {
+            position: relative;
+            z-index: 2;
+
+            display: block;
+
+            width: min(650px, 90%);
+
+            margin: 45px auto -170px;
+
+            filter:
+                drop-shadow(0 30px 30px rgba(0,0,0,.15));
+
+            animation:
+                characterFloat 5s ease-in-out infinite;
+        }
+
+        @keyframes characterFloat {
+
+            0%,100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+
+        /* =========================================================
+           FOOTER
+        ========================================================= */
+
+        footer {
+            background: #102b20;
+
+            color: rgba(255,255,255,.65);
+
+            padding: 60px 0 25px;
+        }
+
+        .footer-grid {
+            display: grid;
+
+            grid-template-columns: 1fr auto 1fr;
+
+            align-items: center;
+
+            gap: 30px;
+
+            padding-bottom: 45px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+        }
+
+        .footer-tagline {
+            margin-top: 8px;
+
+            font-size: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 25px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .footer-links a {
+            transition: .2s ease;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-right {
+            text-align: right;
+
+            font-size: 12px;
+        }
+
+        .footer-bottom {
+            padding-top: 22px;
+
+            border-top: 1px solid rgba(255,255,255,.08);
+
+            text-align: center;
+
+            color: rgba(255,255,255,.35);
+
+            font-size: 11px;
+        }
+
+
+        /* =========================================================
+           SCROLL BUTTON
+        ========================================================= */
+
+        .scroll-top {
+            position: fixed;
+
+            z-index: 999;
+
+            right: 22px;
+            bottom: 22px;
+
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 0;
+
+            border-radius: 50%;
+
+            background: var(--forest);
+            color: white;
+
+            cursor: pointer;
+
+            box-shadow: var(--shadow-md);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transform: translateY(10px);
+
+            transition: .3s ease;
+        }
+
+        .scroll-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+
+        /* =========================================================
+           REVEAL ANIMATIONS
+        ========================================================= */
+
+        .reveal {
+            opacity: 0;
+
+            transform:
+                translateY(35px);
+
+            transition:
+                opacity .8s ease,
+                transform .8s var(--ease);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 {
+            transition-delay: .1s;
+        }
+
+        .delay-2 {
+            transition-delay: .2s;
+        }
+
+        .delay-3 {
+            transition-delay: .3s;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 950px) {
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content {
+                margin: auto;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-actions,
+            .trust-row {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                min-height: 480px;
+            }
+
+            .india-layout {
+                grid-template-columns: 1fr;
+                gap: 45px;
+            }
+
+            .stats-grid,
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .footer-links {
+                justify-content: center;
+            }
+
+            .footer-right {
+                text-align: center;
+            }
+        }
+
+
+        @media (max-width: 620px) {
+
+            .container {
+                width: min(100% - 28px, 1180px);
+            }
+
+            .navbar {
+                width: calc(100% - 20px);
+            }
+
+            .navbar-logo img {
+                height: 40px;
+            }
+
+            .nav-login {
+                display: none;
+            }
+
+            .navbar .btn {
+                padding: 10px 13px;
+                font-size: 12px;
+            }
+
+            .section {
+                padding: 85px 0;
+            }
+
+            .hero {
+                padding-top: 125px;
+            }
+
+            .hero h1 {
+                font-size: clamp(45px, 13vw, 65px);
+            }
+
+            .hero-description {
+                font-size: 15px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                gap: 13px;
+            }
+
+            .hero-visual {
+                min-height: 370px;
+            }
+
+            .hero-orbit {
+                width: 340px;
+                height: 340px;
+            }
+
+            .float-card.one {
+                left: 0;
+                top: 35px;
+            }
+
+            .float-card.two {
+                right: 0;
+                bottom: 50px;
+            }
+
+            .monitor {
+                padding: 10px;
+                border-radius: 22px;
+            }
+
+            .monitor-inner {
+                padding: 16px;
+            }
+
+            .monitor-top {
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .monitor-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .timer {
+                margin-left: 21px;
+            }
+
+            .food-location {
+                display: inline-block;
+            }
+
+            .stats-grid {
+                gap: 12px;
+            }
+
+            .stat-card {
+                min-height: 180px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .india-card {
+                grid-template-columns: 6px 1fr;
+            }
+
+            .india-badge {
+                display: none;
+            }
+
+            .cta {
+                padding-top: 95px;
+            }
+
+            .cta h2 {
+                font-size: 52px;
+            }
+
+            .characters {
+                margin-bottom: -100px;
+            }
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="navbar" id="navbar">
+
+    <a href="#" class="navbar-logo">
+        <img
+            src="assets/logo-horizontal.png"
+            alt="KitchenSense Logo"
+        >
+    </a>
+
+    <div class="navbar-actions">
+
+        <a href="auth.html" class="nav-login">
+            Login
+        </a>
+
+        <a href="auth.html" class="btn btn-primary">
+            Get Started Free
+            <span>→</span>
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+
+    <div class="container hero-grid">
+
+        <div class="hero-content reveal">
+
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                🇮🇳 Built for Indian Kitchens
+            </div>
+
+            <h1>
+                Your kitchen deserves
+                <span>a smarter pantry.</span>
+            </h1>
+
+            <p class="hero-description">
+                Track fresh vegetables, packaged groceries, and homemade food
+                — all in one place. Get AI-powered suggestions before anything
+                goes to waste.
+            </p>
+
+            <div class="hero-actions">
+
+                <a
+                    href="auth.html"
+                    class="btn btn-primary btn-large"
+                >
+                    Start for Free
+                    <span>→</span>
+                </a>
+
+                <a
+                    href="#how-it-works"
+                    class="hero-secondary"
+                >
+                    See how it works
+                    <span>↓</span>
+                </a>
+
+            </div>
+
+            <div class="trust-row">
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    Free forever
+                </div>
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    No credit card needed
+                </div>
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    Made for Indian homes
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual reveal delay-2">
+
+            <div class="hero-orbit"></div>
+
+            <div class="float-card one">
+
+                <div class="float-card-label">
+                    Kitchen status
+                </div>
+
+                <div class="float-card-value">
+                    4 items tracked
+                </div>
+
+            </div>
+
+            <div class="float-card two">
+
+                <div class="float-card-label">
+                    Smart suggestion
+                </div>
+
+                <div class="float-card-value">
+                    🍮 Make kheer
+                </div>
+
+            </div>
+
+            <img
+                src="assets/illustration.png"
+                class="hero-image"
+                alt="KitchenSense illustration"
+            >
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     LIVE MONITOR
+========================================================= -->
+
+<section class="section monitor-section">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                Live Kitchen Monitor
+            </div>
+
+            <h2>
+                See what's happening in a KitchenSense kitchen right now
+            </h2>
+
+            <p>
+                Live expiry tracking, updated every second
+            </p>
+
+        </div>
+
+
+        <div class="monitor-wrapper reveal">
+
+            <div class="monitor">
+
+                <div class="monitor-inner">
+
+                    <div class="monitor-top">
+
+                        <div class="radar">
+                            <span class="radar-dot"></span>
+                            Live Kitchen Radar
+                        </div>
+
+                        <div class="urgent-count">
+                            2 Urgent Alerts
+                        </div>
+
+                    </div>
+
+
+                    <div class="monitor-list">
+
+                        <div class="monitor-item urgent">
+
+                            <div class="food-info">
+
+                                <span class="status red"></span>
+
+                                <span class="food-name">
+                                    Toned Milk
+                                </span>
+
+                                <span class="food-location">
+                                    Fridge Door
+                                </span>
+
+                                <span class="urgent-text">
+                                    ⚠ Expires Today
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="timer red"
+                                data-seconds="85500"
+                            >
+                                23:45:00
+                            </div>
+
+                        </div>
+
+
+                        <div class="monitor-item">
+
+                            <div class="food-info">
+
+                                <span class="status amber"></span>
+
+                                <span class="food-name">
+                                    Cooked Dal
+                                </span>
+
+                                <span class="food-location">
+                                    Fridge Top
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="timer"
+                                data-seconds="127200"
+                            >
+                                1d 11:20:00
+                            </div>
+
+                        </div>
+
+
+                        <div class="monitor-item">
+
+                            <div class="food-info">
+
+                                <span class="status amber"></span>
+
+                                <span class="food-name">
+                                    Fresh Paneer
+                                </span>
+
+                                <span class="food-location">
+                                    Chiller Tray
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="timer"
+                                data-seconds="202500"
+                            >
+                                2d 08:15:00
+                            </div>
+
+                        </div>
+
+
+                        <div class="monitor-item">
+
+                            <div class="food-info">
+
+                                <span class="status green"></span>
+
+                                <span class="food-name">
+                                    Wheat Flour
+                                </span>
+
+                                <span class="food-location">
+                                    Shelf Dabba
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="timer"
+                                data-seconds="1555200"
+                            >
+                                18d 00:00:00
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="recommendation">
+                        💡 Consume First: Make kheer with expiring milk tonight
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     STATS
+========================================================= -->
+
+<section class="section stats-section">
+
+    <div class="container">
+
+        <div class="section-heading stats-heading reveal">
+
+            <div>
+                <span class="section-kicker">The Problem</span>
+            </div>
+
+            <h2>
+                India wastes ₹92,000 crore of food every year.
+            </h2>
+
+            <p>
+                Most of it starts in the kitchen.
+            </p>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card reveal">
+
+                <div
+                    class="stat-number"
+                    id="stat-1"
+                >
+                    ₹0
+                </div>
+
+                <div class="stat-label">
+                    Average food wasted per Indian household annually
+                </div>
+
+            </div>
+
+
+            <div class="stat-card reveal delay-1">
+
+                <div
+                    class="stat-number"
+                    id="stat-2"
+                >
+                    0%
+                </div>
+
+                <div class="stat-label">
+                    Of food bought never gets eaten
+                </div>
+
+            </div>
+
+
+            <div class="stat-card reveal delay-2">
+
+                <div class="stat-number">
+                    3 days
+                </div>
+
+                <div class="stat-label">
+                    Average time before leftovers are forgotten
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     HOW IT WORKS
+========================================================= -->
+
+<section
+    class="section steps"
+    id="how-it-works"
+>
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+
+            <div class="eyebrow">
+                Simple by design
+            </div>
+
+            <h2>
+                How KitchenSense works
+            </h2>
+
+            <p>
+                Three steps. Ten seconds to start.
+            </p>
+
+        </div>
+
+
+        <div class="steps-grid">
+
+            <article class="step-card reveal">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div class="step-icon">
+                    📦
+                </div>
+
+                <div class="step-label">
+                    Step 1
+                </div>
+
+                <h3>
+                    Add your food
+                </h3>
+
+                <p>
+                    Log packaged items with expiry dates, or homemade food
+                    with cook date and shelf life. Takes 10 seconds.
+                </p>
+
+            </article>
+
+
+            <article class="step-card reveal delay-1">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div class="step-icon">
+                    🔔
+                </div>
+
+                <div class="step-label">
+                    Step 2
+                </div>
+
+                <h3>
+                    Get smart alerts
+                </h3>
+
+                <p>
+                    KitchenSense sends you email or SMS alerts 2 days before
+                    anything expires. Never be surprised again.
+                </p>
+
+            </article>
+
+
+            <article class="step-card reveal delay-2">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div class="step-icon">
+                    🤖
+                </div>
+
+                <div class="step-label">
+                    Step 3
+                </div>
+
+                <h3>
+                    AI suggests what to cook
+                </h3>
+
+                <p>
+                    Our AI knows what is expiring and suggests zero-waste
+                    Indian recipes using exactly those ingredients.
+                </p>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     BUILT FOR INDIA
+========================================================= -->
+
+<section class="section india-section">
+
+    <div class="container india-layout">
+
+        <div class="india-intro reveal">
+
+            <div class="eyebrow">
+                Made for India
+            </div>
+
+            <h2>
+                Built for real Indian kitchens.
+            </h2>
+
+            <p>
+                Not every home has the same kitchen. KitchenSense adapts to yours.
+            </p>
+
+            <p class="india-note">
+                The only food tracker that knows not every Indian home has a working fridge.
+            </p>
+
+        </div>
+
+
+        <div class="india-cards">
+
+            <article class="india-card reveal">
+
+                <div class="india-bar green"></div>
+
+                <div>
+
+                    <div class="india-title">
+                        ✅ Fully functional fridge
+                    </div>
+
+                    <div class="india-desc">
+                        Standard shelf life tracking with refrigerator and freezer
+                        zones. Reliable chilling and freezer alerts.
+                    </div>
+
+                </div>
+
+                <div class="india-badge green">
+                    STANDARD
+                </div>
+
+            </article>
+
+
+            <article class="india-card reveal delay-1">
+
+                <div class="india-bar amber"></div>
+
+                <div>
+
+                    <div class="india-title">
+                        ⚠️ Old or weak fridge
+                    </div>
+
+                    <div class="india-desc">
+                        Adjusted expiry advice for ambient warmth and quick dairy
+                        consumption windows.
+                    </div>
+
+                </div>
+
+                <div class="india-badge amber">
+                    ADJUSTED
+                </div>
+
+            </article>
+
+
+            <article class="india-card reveal delay-2">
+
+                <div class="india-bar red"></div>
+
+                <div>
+
+                    <div class="india-title">
+                        ❌ No refrigerator
+                    </div>
+
+                    <div class="india-desc">
+                        Optimised shelf life for room temperature, steel dabbas,
+                        wire nets, and clay matkas.
+                    </div>
+
+                </div>
+
+                <div class="india-badge red">
+                    PANTRY ONLY
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FEATURES
+========================================================= -->
+
+<section class="section features">
+
+    <div class="container">
+
+        <div class="section-heading reveal">
+
+            <div class="eyebrow">
+                KitchenSense toolkit
+            </div>
+
+            <h2>
+                Everything your kitchen needs
+            </h2>
+
+            <p>
+                Powerful features, zero complexity.
+            </p>
+
+        </div>
+
+
+        <div class="features-grid">
+
+            <article class="feature reveal">
+
+                <div class="feature-icon">
+                    🗓
+                </div>
+
+                <h3>
+                    Expiry Tracking
+                </h3>
+
+                <p>
+                    Never miss an expiry date again. Packaged or homemade,
+                    we track it all.
+                </p>
+
+            </article>
+
+
+            <article class="feature reveal delay-1">
+
+                <div class="feature-icon">
+                    🍳
+                </div>
+
+                <h3>
+                    Homemade Food
+                </h3>
+
+                <p>
+                    Log cook date and shelf life for dals, subzis, and rotis.
+                    We calculate the rest.
+                </p>
+
+            </article>
+
+
+            <article class="feature reveal delay-2">
+
+                <div class="feature-icon">
+                    🤖
+                </div>
+
+                <h3>
+                    AI Recipe Suggestions
+                </h3>
+
+                <p>
+                    Get zero-waste Indian recipe ideas based on exactly what
+                    is about to expire.
+                </p>
+
+            </article>
+
+
+            <article class="feature reveal">
+
+                <div class="feature-icon">
+                    💬
+                </div>
+
+                <h3>
+                    Smart Kitchen Chatbot
+                </h3>
+
+                <p>
+                    Ask anything — fridge full? Leftover curd?
+                    Your AI kitchen assistant answers.
+                </p>
+
+            </article>
+
+
+            <article class="feature reveal delay-1">
+
+                <div class="feature-icon">
+                    🔔
+                </div>
+
+                <h3>
+                    SMS and Email Alerts
+                </h3>
+
+                <p>
+                    Get notified 2 days before expiry via email or SMS.
+                    No app needed to stay updated.
+                </p>
+
+            </article>
+
+
+            <article class="feature reveal delay-2">
+
+                <div class="feature-icon">
+                    ♻️
+                </div>
+
+                <h3>
+                    Zero Waste Score
+                </h3>
+
+                <p>
+                    Track how much food and money you have saved this month.
+                    See your impact grow.
+                </p>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FINAL CTA
+========================================================= -->
+
+<section class="cta">
+
+    <div class="container">
+
+        <div class="cta-content reveal">
+
+            <div>
+                <span class="section-kicker">Start Today</span>
+            </div>
+
+            <h2>
+                Your kitchen is
+                <span>waiting.</span>
+            </h2>
+
+            <p class="cta-subtext">
+                Join Indian households reducing food waste — one item at a time.
+            </p>
+
+            <a
+                href="auth.html"
+                class="cta-button"
+            >
+                Start for Free →
+            </a>
+
+            <p class="guarantee">
+                Free forever · No credit card · Takes 2 minutes
+            </p>
+
+        </div>
+
+
+        <img
+            src="assets/characters.png"
+            alt="KitchenSense characters"
+            class="characters"
+        >
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+            <div>
+
+                <div class="footer-logo">
+                    <img
+                        src="assets/logo-horizontal.png"
+                        alt="KitchenSense"
+                    >
+                </div>
+
+                <p class="footer-tagline">
+                    Your kitchen, finally making sense.
+                </p>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <a href="#">
+                    Privacy
+                </a>
+
+                <a href="#">
+                    Terms
+                </a>
+
+                <a href="#">
+                    Contact
+                </a>
+
+            </div>
+
+
+            <div class="footer-right">
+                Made with ❤️ for Indian homes
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+            © 2026 KitchenSense. Built on AWS.
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     SCROLL TOP
+========================================================= -->
+
+<button
+    class="scroll-top"
+    id="scrollTop"
+    aria-label="Scroll to top"
+>
+    ↑
+</button>
+
+
+<script>
+
+    /* =========================================================
+       NAVBAR
+    ========================================================= */
+
+    const navbar = document.getElementById("navbar");
+
+    window.addEventListener("scroll", () => {
+
+        if (window.scrollY > 40) {
+            navbar.classList.add("scrolled");
+        } else {
+            navbar.classList.remove("scrolled");
+        }
+
+    });
+
+
+    /* =========================================================
+       COUNTDOWN TIMERS
+    ========================================================= */
+
+    const timers =
+        document.querySelectorAll(".timer");
+
+    function updateTimers() {
+
+        timers.forEach(timer => {
+
+            let seconds =
+                parseInt(
+                    timer.dataset.seconds,
+                    10
+                );
+
+            if (seconds <= 0) {
+
+                timer.textContent = "EXPIRED";
+
+                timer.classList.add("red");
+
+                return;
+            }
+
+            seconds--;
+
+            timer.dataset.seconds = seconds;
+
+            const days =
+                Math.floor(seconds / 86400);
+
+            const hours =
+                Math.floor(
+                    (seconds % 86400) / 3600
+                );
+
+            const minutes =
+                Math.floor(
+                    (seconds % 3600) / 60
+                );
+
+            const secs =
+                seconds % 60;
+
+            const h =
+                String(hours).padStart(2,"0");
+
+            const m =
+                String(minutes).padStart(2,"0");
+
+            const s =
+                String(secs).padStart(2,"0");
+
+            timer.textContent =
+                days > 0
+                    ? `${days}d ${h}:${m}:${s}`
+                    : `${h}:${m}:${s}`;
+
+        });
+
+    }
+
+    setInterval(updateTimers,1000);
+
+
+    /* =========================================================
+       COUNT UP STATS
+    ========================================================= */
+
+    let statsAnimated = false;
+
+    const statsSection =
+        document.querySelector(".stats-section");
+
+    const stat1 =
+        document.getElementById("stat-1");
+
+    const stat2 =
+        document.getElementById("stat-2");
+
+
+    function countUp(
+        element,
+        target,
+        prefix,
+        suffix
+    ) {
+
+        const duration = 1700;
+
+        const startTime = performance.now();
+
+        function animate(currentTime) {
+
+            const progress =
+                Math.min(
+                    (currentTime - startTime) / duration,
+                    1
+                );
+
+            const eased =
+                1 - Math.pow(1-progress,3);
+
+            const value =
+                Math.floor(target * eased);
+
+            element.textContent =
+                prefix +
+                value.toLocaleString("en-IN") +
+                suffix;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+
+    const statsObserver =
+        new IntersectionObserver(
+            entries => {
+
+                entries.forEach(entry => {
+
+                    if (
+                        entry.isIntersecting &&
+                        !statsAnimated
+                    ) {
+
+                        statsAnimated = true;
+
+                        countUp(
+                            stat1,
+                            50000,
+                            "₹",
+                            ""
+                        );
+
+                        countUp(
+                            stat2,
+                            40,
+                            "",
+                            "%"
+                        );
+
+                        statsObserver.disconnect();
+                    }
+
+                });
+
+            },
+            {
+                threshold: .3
+            }
+        );
+
+
+    if (statsSection) {
+        statsObserver.observe(statsSection);
+    }
+
+
+    /* =========================================================
+       SCROLL REVEALS
+    ========================================================= */
+
+    const revealElements =
+        document.querySelectorAll(".reveal");
+
+
+    const revealObserver =
+        new IntersectionObserver(
+            entries => {
+
+                entries.forEach(entry => {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.classList.add("visible");
+
+                        revealObserver.unobserve(
+                            entry.target
+                        );
+
+                    }
+
+                });
+
+            },
+            {
+                threshold: .12
+            }
+        );
+
+
+    revealElements.forEach(element => {
+
+        revealObserver.observe(element);
+
+    });
+
+
+    /* =========================================================
+       SCROLL TOP
+    ========================================================= */
+
+    const scrollTop =
+        document.getElementById("scrollTop");
+
+
+    window.addEventListener("scroll", () => {
+
+        if (window.scrollY > 500) {
+
+            scrollTop.classList.add("show");
+
+        } else {
+
+            scrollTop.classList.remove("show");
+
+        }
+
+    });
+
+
+    scrollTop.addEventListener("click", () => {
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

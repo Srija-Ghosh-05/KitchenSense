@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitchenSense - Login / Sign Up</title>
+    <link rel="icon" type="image/png" href="assets/logo-stacked.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-dark: #2d6a4f;
+            --light-green: #52b788;
+            --bg-color: #f8faf8;
+            --white: #ffffff;
+            --text-dark: #1a2e1a;
+            --text-grey: #4a5568;
+            --red-urgent: #ef4444;
+            --amber-warning: #f59e0b;
+            --gold-value: #d97706;
+            --border-color: #e2e8f0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-width: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .page-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* =========================================================
+           LEFT PANEL — DASHBOARD-STYLE BRAND AREA
+           ========================================================= */
+
+        .left-panel {
+            width: 42%;
+            min-height: 100vh;
+            flex: 0 0 42%;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 24px 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            background: rgba(82, 183, 136, 0.10);
+            top: -120px;
+            left: -120px;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.045);
+            bottom: -120px;
+            right: -100px;
+        }
+
+        .top-text {
+            text-align: center;
+            width: 100%;
+            max-width: 440px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-text .subheading {
+            color: var(--light-green);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .top-text h1 {
+            color: var(--white);
+            font-size: clamp(1.6rem, 2.3vw, 2rem);
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .scene-wrapper {
+            width: min(380px, 100%);
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .characters-container {
+            position: relative;
+            width: 380px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+            transform-origin: center bottom;
+        }
+
+        .characters-img {
+            width: 380px;
+            max-width: 100%;
+            height: auto;
+            animation: gentleBob 3s ease-in-out infinite;
+            transition: transform 0.5s ease;
+            transform-origin: center center;
+        }
+
+        .shy-emoji {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--white);
+            color: var(--primary-dark);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            white-space: nowrap;
+        }
+
+        .shy-emoji.visible {
+            opacity: 1;
+        }
+
+        .characters-img.looking-away {
+            animation: none !important;
+            transform: scaleX(-1) rotate(-15deg) !important;
+        }
+
+        @keyframes gentleBob {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes happyBounce {
+            0%, 100% { transform: translateY(0px); }
+            20% { transform: translateY(-20px); }
+            40% { transform: translateY(-5px); }
+            60% { transform: translateY(-15px); }
+            80% { transform: translateY(-3px); }
+        }
+
+        .characters-img.bouncing {
+            animation: happyBounce 0.6s ease;
+        }
+
+        .bottom-badges {
+            display: flex;
+            gap: 12px;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.82);
+            font-weight: 500;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* =========================================================
+           RIGHT PANEL — SAME LIGHT BACKGROUND + CARD LANGUAGE
+           AS THE DASHBOARD
+           ========================================================= */
+
+        .right-panel {
+            flex: 1;
+            min-width: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 32px 28px;
+            overflow-y: auto;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 460px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.035);
+            margin: auto 0;
+        }
+
+        .logo-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .logo-header img {
+            height: 34px;
+            max-width: 100%;
+        }
+
+        /* TABS */
+
+        .tab-switcher {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            width: 100%;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 11px 0 10px;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-grey);
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .tab-button.active {
+            color: var(--primary-dark);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-dark);
+        }
+
+        /* FORM STYLES */
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-header {
+            margin-bottom: 2px;
+        }
+
+        .form-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .form-header p {
+            color: var(--text-grey);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .form-group label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            min-width: 0;
+            padding: 11px 13px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+            background-color: var(--white);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--light-green);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.16);
+        }
+
+        .forgot-link {
+            align-self: flex-end;
+            margin-top: -3px;
+            font-size: 0.78rem;
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            padding: 11px 14px;
+            min-height: 42px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            margin-top: 3px;
+        }
+
+        .submit-btn:hover {
+            background-color: #23543e;
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            text-align: center;
+            color: var(--text-grey);
+            font-size: 0.76rem;
+            margin: 0;
+        }
+
+        .switch-form-text {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-grey);
+            line-height: 1.4;
+        }
+
+        .switch-form-text a {
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .switch-form-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* STORAGE CALIBRATION SECTION */
+
+        .calibration-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 3px;
+            background: var(--bg-color);
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(45, 106, 79, 0.15);
+        }
+
+        .calibration-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: 0.5px;
+        }
+
+        .calibration-question {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.35;
+        }
+
+        .calibration-subtext {
+            font-size: 0.72rem;
+            color: var(--text-grey);
+            margin-top: -5px;
+            line-height: 1.35;
+        }
+
+        .radio-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 11px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            min-width: 0;
+        }
+
+        .radio-card:hover {
+            border-color: rgba(45, 106, 79, 0.45);
+        }
+
+        .radio-card input[type="radio"] {
+            margin-top: 3px;
+            accent-color: var(--primary-dark);
+            flex: 0 0 auto;
+        }
+
+        .radio-card-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .radio-card-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .radio-card-desc {
+            font-size: 0.7rem;
+            color: var(--text-grey);
+            line-height: 1.3;
+        }
+
+        .badge {
+            flex-shrink: 0;
+            font-size: 0.58rem;
+            font-weight: 700;
+            padding: 3px 6px;
+            border-radius: 5px;
+            align-self: flex-start;
+            white-space: nowrap;
+        }
+
+        .badge-green {
+            background-color: #e8f5e9;
+            color: var(--primary-dark);
+        }
+
+        .badge-amber {
+            background-color: #fff8e1;
+            color: var(--amber-warning);
+        }
+
+        .badge-red {
+            background-color: #ffebee;
+            color: var(--red-urgent);
+        }
+
+        .radio-card.selected-green {
+            border-color: var(--primary-dark);
+            background-color: #f4fbf7;
+        }
+
+        .radio-card.selected-amber {
+            border-color: var(--amber-warning);
+            background-color: #fffdf5;
+        }
+
+        .radio-card.selected-red {
+            border-color: var(--red-urgent);
+            background-color: #fff9f9;
+        }
+
+        /* ERROR MESSAGE */
+
+        .error-message {
+            color: var(--red-urgent);
+            font-size: 0.78rem;
+            text-align: center;
+            display: none;
+            margin-top: -3px;
+        }
+
+        /* SPINNER */
+
+        .spinner {
+            width: 17px;
+            height: 17px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* =========================================================
+           RESPONSIVE DESIGN
+           ========================================================= */
+
+        @media (max-width: 900px) {
+            .left-panel {
+                width: 40%;
+                flex-basis: 40%;
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .right-panel {
+                padding: 24px 20px;
+            }
+
+            .form-container {
+                padding: 24px;
+            }
+
+            .scene-wrapper,
+            .characters-container {
+                width: 100%;
+                height: 280px;
+            }
+
+            .characters-img {
+                width: min(340px, 100%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            html,
+            body {
+                width: 100%;
+                min-width: 0;
+                overflow-x: hidden;
+            }
+
+            .page-container {
+                display: block;
+                width: 100%;
+                min-height: 100vh;
+            }
+
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                width: 100%;
+                min-height: 100vh;
+                padding: 18px 14px;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+            }
+
+            .form-container {
+                width: 100%;
+                max-width: 520px;
+                margin: 0;
+                padding: 22px 16px;
+                border-radius: 12px;
+                gap: 20px;
+            }
+
+            .logo-header img {
+                height: 32px;
+            }
+
+            .tab-button {
+                font-size: 0.86rem;
+                padding: 10px 0 9px;
+            }
+
+            .auth-form {
+                gap: 14px;
+            }
+
+            .form-header h2 {
+                font-size: 1.25rem;
+            }
+
+            .form-header p {
+                font-size: 0.76rem;
+            }
+
+            .form-group input {
+                padding: 11px 12px;
+                font-size: 0.86rem;
+            }
+
+            .calibration-section {
+                padding: 13px;
+            }
+
+            .radio-card {
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .radio-card-title {
+                font-size: 0.75rem;
+            }
+
+            .radio-card-desc {
+                font-size: 0.68rem;
+            }
+
+            .badge {
+                font-size: 0.55rem;
+                padding: 3px 5px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .right-panel {
+                padding: 12px 10px;
+            }
+
+            .form-container {
+                padding: 18px 13px;
+                gap: 18px;
+            }
+
+            .logo-header img {
+                height: 30px;
+            }
+
+            .radio-card {
+                display: grid;
+                grid-template-columns: auto minmax(0, 1fr);
+                align-items: start;
+            }
+
+            .radio-card .badge {
+                grid-column: 2;
+                margin-top: -2px;
+                justify-self: start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-container">
+        <!-- LEFT PANEL - Characters -->
+        <div class="left-panel">
+            <div class="top-text">
+                <span class="subheading">Your kitchen, finally making sense.</span>
+                <h1>Never let food go to waste again.</h1>
+            </div>
+
+            <!-- Image Character Scene -->
+            <div class="scene-wrapper" id="sceneWrapper">
+                <div class="characters-container" id="charactersContainer">
+                    <img src="assets/characters.png" alt="KitchenSense Characters" class="characters-img" id="charactersImg">
+                    <div class="shy-emoji" id="shyEmoji">
+                        🫣 We're looking away!
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-badges">
+                <span>🔒 Secure</span>
+                <span>·</span>
+                <span>🇮🇳 Made for India</span>
+                <span>·</span>
+                <span>✓ Free forever</span>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL - Auth Forms -->
+        <div class="right-panel">
+            <div class="form-container">
+                <div class="logo-header">
+                    <img src="assets/logo-horizontal.png" alt="KitchenSense Logo">
+                </div>
+
+                <!-- Tab Switcher -->
+                <div class="tab-switcher">
+                    <button type="button" class="tab-button active" id="loginTabBtn" onclick="switchTab('login')">Login</button>
+                    <button type="button" class="tab-button" id="signupTabBtn" onclick="switchTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- LOGIN FORM -->
+                <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-header">
+                        <h2>Welcome back!</h2>
+                        <p>Your kitchen missed you.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" required placeholder="name@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="pwd-field" required placeholder="••••••••">
+                    </div>
+
+                    <a href="#" class="forgot-link">Forgot password?</a>
+
+                    <button type="submit" class="submit-btn" id="loginSubmitBtn">
+                        <span>Login →</span>
+                        <div class="spinner" id="loginSpinner"></div>
+                    </button>
+
+                    <div class="divider">── or ──</div>
+
+                    <div class="switch-form-text">
+                        Don't have an account? <a onclick="switchTab('signup')">Sign up</a>
+                    </div>
+                </form>
+
+                <!-- SIGN UP FORM -->
+                <form class="auth-form" id="signupForm" style="display: none;" onsubmit="handleSignup(event)">
+                    <div class="form-header">
+                        <h2>Join KitchenSense</h2>
+                        <p>Your kitchen, finally making sense.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" required placeholder="Rahul Sharma">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" required placeholder="name@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" class="pwd-field" required placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" class="pwd-field" required placeholder="••••••••">
+                    </div>
+
+                    <!-- STORAGE CALIBRATION SECTION -->
+                    <div class="calibration-section">
+                        <span class="calibration-label">⚙ STORAGE CALIBRATION</span>
+                        <span class="calibration-question">Do you have a working refrigerator at home?</span>
+                        <span class="calibration-subtext">Calibrates shelf life advice for your kitchen</span>
+
+                        <div class="radio-cards">
+                            <label class="radio-card selected-green" id="card-standard">
+                                <input type="radio" name="fridgeOption" value="standard" checked onclick="selectFridgeCard('standard')">
+                                <div class="radio-card-content">
+                                    <span class="radio-card-title">✅ Yes, fully functional</span>
+                                    <span class="radio-card-desc">Reliable chilling & freezer</span>
+                                </div>
+                                <span class="badge badge-green">STANDARD</span>
+                            </label>
+
+                            <label class="radio-card" id="card-adjusted">
+                                <input type="radio" name="fridgeOption" value="adjusted" onclick="selectFridgeCard('adjusted')">
+                                <div class="radio-card-content">
+                                    <span class="radio-card-title">⚠️ Yes, but old or not very cold</span>
+                                    <span class="radio-card-desc">Adjusts expiry advice</span>
+                                </div>
+                                <span class="badge badge-amber">ADJUSTED</span>
+                            </label>
+
+                            <label class="radio-card" id="card-pantry">
+                                <input type="radio" name="fridgeOption" value="pantry" onclick="selectFridgeCard('pantry')">
+                                <div class="radio-card-content">
+                                    <span class="radio-card-title">❌ No refrigerator</span>
+                                    <span class="radio-card-desc">Room temperature tracking</span>
+                                </div>
+                                <span class="badge badge-red">PANTRY ONLY</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="error-message" id="signupError">Please fill out all required fields.</div>
+
+                    <button type="submit" class="submit-btn" id="signupSubmitBtn">
+                        <span>Create Account →</span>
+                        <div class="spinner" id="signupSpinner"></div>
+                    </button>
+
+                    <div class="switch-form-text">
+                        Already have an account? <a onclick="switchTab('login')">Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* MOUSE TILT — whole container tilts toward cursor */
+        const container = document.getElementById('charactersContainer');
+        const img = document.getElementById('charactersImg');
+        const shyEmoji = document.getElementById('shyEmoji');
+
+        let isLookingAway = false;
+
+        document.addEventListener('mousemove', (e) => {
+            if (isLookingAway) return;
+            const windowWidth = window.innerWidth;
+            const centerX = windowWidth / 2;
+            const tiltPercent = (e.clientX - centerX) / centerX;
+            const maxTilt = 8;
+            const tiltDegree = tiltPercent * maxTilt;
+            container.style.transform = `rotate(${tiltDegree}deg)`;
+        });
+
+        /* PASSWORD LOOK-AWAY */
+        const passwordFields = document.querySelectorAll('.pwd-field');
+
+        passwordFields.forEach(field => {
+            field.addEventListener('focus', () => {
+                isLookingAway = true;
+                img.classList.add('looking-away');
+                shyEmoji.classList.add('visible');
+                container.style.transform = 
+                'rotate(-20deg) translateX(-30px)';
+            });
+            field.addEventListener('blur', () => {
+                isLookingAway = false;
+                img.classList.remove('looking-away');
+                shyEmoji.classList.remove('visible');
+                container.style.transform = 'rotate(0deg)';
+            });
+        });
+
+        /* HAPPY BOUNCE ON SUBMIT */
+        function triggerBounce() {
+            img.classList.remove('bouncing');
+            void img.offsetWidth; // force reflow
+            img.classList.add('bouncing');
+            setTimeout(() => {
+                img.classList.remove('bouncing');
+            }, 600);
+        }
+
+        /* TAB SWITCHING */
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const loginTabBtn = document.getElementById('loginTabBtn');
+            const signupTabBtn = document.getElementById('signupTabBtn');
+            const signupError = document.getElementById('signupError');
+
+            signupError.style.display = 'none';
+
+            if (tab === 'login') {
+                loginForm.style.display = 'flex';
+                signupForm.style.display = 'none';
+                loginTabBtn.classList.add('active');
+                signupTabBtn.classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'flex';
+                signupTabBtn.classList.add('active');
+                loginTabBtn.classList.remove('active');
+            }
+        }
+
+        /* FRIDGE CARD SELECTION */
+        function selectFridgeCard(type) {
+            const cardStandard = document.getElementById('card-standard');
+            const cardAdjusted = document.getElementById('card-adjusted');
+            const cardPantry = document.getElementById('card-pantry');
+
+            cardStandard.className = 'radio-card';
+            cardAdjusted.className = 'radio-card';
+            cardPantry.className = 'radio-card';
+
+            if (type === 'standard') {
+                cardStandard.classList.add('selected-green');
+            } else if (type === 'adjusted') {
+                cardAdjusted.classList.add('selected-amber');
+            } else if (type === 'pantry') {
+                cardPantry.classList.add('selected-red');
+            }
+        }
+
+        /* FORM HANDLERS
+           
+           TODO: Replace simulation with real Cognito authentication 
+           calls from auth.js
+        */
+        function handleLogin(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const btnText = submitBtn.querySelector('span');
+            const spinner = document.getElementById('loginSpinner');
+
+            triggerBounce();
+
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            submitBtn.disabled = true;
+
+            const loginEmail = document.getElementById('loginEmail').value.trim();
+            // Keep the same user identity across login
+            const generatedUserId = 'user_' + loginEmail.replace(/[^a-z0-9]/gi, '').toLowerCase().substring(0, 10);
+            localStorage.setItem('userId', generatedUserId);
+            localStorage.setItem('userEmail', loginEmail);
+            // Keep a default fridge setting if none exists
+            if (!localStorage.getItem('fridgeStatus')) {
+                localStorage.setItem('fridgeStatus', 'standard');
+            }
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const pwd = document.getElementById('signupPassword').value;
+            const confirmPwd = document.getElementById('signupConfirmPassword').value;
+            const fridgeSelected = document.querySelector('input[name="fridgeOption"]:checked');
+            const errorMsg = document.getElementById('signupError');
+
+            if (!name || !email || !pwd || !confirmPwd || !fridgeSelected) {
+                errorMsg.textContent = 'Please fill in all required fields.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (pwd !== confirmPwd) {
+                errorMsg.textContent = 'Passwords do not match.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+
+            triggerBounce();
+
+            const submitBtn = document.getElementById('signupSubmitBtn');
+            const btnText = submitBtn.querySelector('span');
+            const spinner = document.getElementById('signupSpinner');
+
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            submitBtn.disabled = true;
+
+            const fridgeValue = fridgeSelected.value; // 'standard', 'adjusted', or 'pantry'
+            localStorage.setItem('fridgeStatus', fridgeSelected.value);
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userEmail', email);
+
+            const generatedUserId = 'user_' + email.replace(/[^a-z0-9]/gi, '').toLowerCase().substring(0, 10);
+            localStorage.setItem('userId', generatedUserId);
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

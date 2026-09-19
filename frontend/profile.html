@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitchenSense - Profile</title>
+    <link rel="icon" type="image/png" href="assets/logo-stacked.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/api.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-dark: #2d6a4f;
+            --light-green: #52b788;
+            --bg-color: #f8faf8;
+            --white: #ffffff;
+            --text-dark: #1a2e1a;
+            --text-grey: #4a5568;
+            --red: #ef4444;
+            --amber: #f59e0b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* LAYOUT CONTAINER */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .sidebar-logo {
+            padding: 0 8px;
+        }
+
+        .sidebar-logo img {
+            height: 32px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .nav-item.active a {
+            background-color: var(--light-green);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .avatar-container {
+            position: relative;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--light-green);
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #22c55e;
+            border: 2px solid var(--primary-dark);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .user-status {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* MAIN CONTENT WORKSPACE */
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 1200px;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .page-header p {
+            font-size: 0.875rem;
+            color: var(--text-grey);
+            margin-top: 4px;
+        }
+
+        /* GRID CONTENT */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* CARD HEADINGS */
+        .card-header-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+        }
+
+        /* SECTION 1 - HEADER CARD */
+        .profile-header-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .profile-user-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .large-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .profile-details h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .profile-details p {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+            margin-top: 2px;
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            width: fit-content;
+        }
+
+        .btn-primary:hover {
+            background-color: #23543e;
+        }
+
+        .btn-outline-red {
+            background: transparent;
+            border: 1.5px solid var(--red);
+            color: var(--red);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: fit-content;
+        }
+
+        .btn-outline-red:hover {
+            background-color: #fef2f2;
+        }
+
+        /* FRIDGE CARDS */
+        .fridge-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .fridge-card {
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--white);
+        }
+
+        .fridge-card:hover {
+            border-color: var(--light-green);
+        }
+
+        .fridge-card.selected {
+            border-color: var(--primary-dark);
+            background-color: #f4fbf7;
+        }
+
+        .fridge-card-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .fridge-card-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            color: var(--text-grey);
+        }
+
+        .fridge-card.selected .fridge-card-badge {
+            background-color: #c8e6c9;
+            color: var(--primary-dark);
+        }
+
+        /* TOGGLES & NOTIFICATIONS */
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .toggle-pill {
+            width: 44px;
+            height: 24px;
+            background-color: #cbd5e1;
+            border-radius: 12px;
+            padding: 2px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            position: relative;
+        }
+
+        .toggle-pill.active {
+            background-color: var(--primary-dark);
+        }
+
+        .toggle-handle {
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-pill.active .toggle-handle {
+            transform: translateX(20px);
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .slider-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .range-slider {
+            width: 100%;
+            accent-color: var(--primary-dark);
+            cursor: pointer;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-input {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            background-color: var(--white);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--light-green);
+        }
+
+        /* ACCOUNT ACTIONS */
+        .account-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .delete-link {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .delete-link:hover {
+            color: var(--red);
+            text-decoration: underline;
+        }
+
+        /* RIGHT COLUMN: STATS */
+        .stat-card {
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-card.green {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+        }
+
+        .stat-card.teal {
+            background-color: #e0f2fe;
+            border: 1px solid #bae6fd;
+        }
+
+        .stat-card.gold {
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .stat-desc {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+            font-weight: 500;
+        }
+
+        /* PANTRY HEALTH INDEX */
+        .health-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .svg-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+
+        .svg-circle-bg {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 12;
+        }
+
+        .svg-circle-val {
+            fill: none;
+            stroke: var(--primary-dark);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 339.29; /* 2 * PI * 54 */
+            stroke-dashoffset: 339.29;
+            transition: stroke-dashoffset 1.5s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .circle-text-center {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .circle-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-grey);
+        }
+
+        .health-substats {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .substat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            background-color: #fafafa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .green-badge {
+            background-color: #e8f5e9;
+            color: var(--primary-dark);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* ACHIEVEMENTS GRID */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .badge-card {
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .badge-card.earned {
+            background-color: #f4fbf7;
+            border-color: #a7f3d0;
+        }
+
+        .badge-card.locked {
+            background-color: #f8faf8;
+            opacity: 0.6;
+        }
+
+        .badge-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .badge-desc {
+            font-size: 0.7rem;
+            color: var(--text-grey);
+            line-height: 1.2;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 300;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 900px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100vw;
+                height: 60px;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                flex-direction: row;
+                padding: 0 16px;
+                align-items: center;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            }
+
+            .sidebar-top {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-around;
+                align-items: center;
+            }
+
+            .sidebar-logo, .user-profile {
+                display: none;
+            }
+
+            .nav-links {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .nav-item a {
+                padding: 8px;
+                font-size: 0.8rem;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px 16px 80px 16px;
+            }
+
+            .profile-header-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+<style id="kitchensense-unified-redesign">
+/* =========================================================
+   KitchenSense — unified application visual system
+   Matches the approved Add Item page.
+   Content, labels, links, IDs and JavaScript are preserved.
+   ========================================================= */
+:root{
+  --ks-forest-950:#09261a;
+  --ks-forest-900:#0d2f21;
+  --ks-forest-850:#103a29;
+  --ks-forest-800:#144632;
+  --ks-forest-700:#176044;
+  --ks-forest-600:#21805b;
+  --ks-mint-500:#55c79a;
+  --ks-mint-400:#7bd9b0;
+  --ks-mint-200:#c9f3df;
+  --ks-mint-100:#e9faf2;
+  --ks-cream:#f7faf8;
+  --ks-white:#fff;
+  --ks-ink:#14251f;
+  --ks-muted:#667a71;
+  --ks-line:#dfeae4;
+  --ks-red:#ef5b67;
+  --ks-amber:#e5a52d;
+  --ks-shadow-card:0 10px 28px rgba(18,52,38,.07);
+  --ks-shadow-soft:0 5px 16px rgba(18,52,38,.05);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ks-cream);min-height:100%}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 72% 8%,rgba(123,217,176,.10),transparent 25%),var(--ks-cream);color:var(--ks-ink);font-family:'Inter',sans-serif;overflow-x:hidden}
+button,input,select,textarea{font:inherit}
+img,svg{max-width:100%}
+a,button{-webkit-tap-highlight-color:transparent}
+.app-container{width:100%;min-height:100vh;display:block}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;z-index:100;width:295px!important;height:100vh!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;background:var(--ks-forest-900)!important;color:#fff!important;border-right:1px solid rgba(255,255,255,.05)!important;box-shadow:10px 0 28px rgba(8,35,24,.05)!important}
+.sidebar-top{display:flex!important;flex-direction:column!important;gap:0!important;min-width:0!important}
+.sidebar-logo{min-height:82px!important;padding:0 22px!important;display:flex!important;align-items:center!important;border-bottom:1px solid rgba(255,255,255,.08)!important}
+.sidebar-logo img{display:block!important;width:auto!important;max-width:205px!important;height:40px!important;object-fit:contain!important;filter:none!important}
+.nav-links{list-style:none!important;margin:0!important;padding:18px 12px 0!important;display:flex!important;flex-direction:column!important;gap:4px!important}
+.nav-item{min-width:0!important}
+.nav-item a{min-height:48px!important;width:100%!important;padding:11px 14px!important;display:flex!important;align-items:center!important;gap:12px!important;color:rgba(255,255,255,.78)!important;text-decoration:none!important;border-radius:12px!important;font-size:.92rem!important;font-weight:600!important;line-height:1.2!important;transition:background .2s ease,color .2s ease,transform .2s ease!important}
+.nav-item a:hover{background:rgba(85,199,154,.12)!important;color:#fff!important;transform:translateX(1px)!important}
+.nav-item.active a{color:#fff!important;background:linear-gradient(90deg,rgba(63,157,111,.68),rgba(63,157,111,.40))!important;box-shadow:inset 0 0 0 1px rgba(105,218,167,.32)!important;font-weight:700!important}
+.nav-item.active a::after{content:'›';margin-left:auto;font-size:1.25rem;line-height:1;color:#bdf1d9}
+.user-profile{margin:0!important;padding:15px 20px 20px!important;display:flex!important;align-items:center!important;gap:11px!important;border-top:1px solid rgba(255,255,255,.08)!important}
+.avatar-container{position:relative!important;flex:0 0 auto!important}
+.avatar{width:38px!important;height:38px!important;border-radius:11px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#21b77d!important;color:#fff!important;font-size:.82rem!important;font-weight:800!important;box-shadow:0 5px 16px rgba(33,183,125,.20)!important}
+.online-dot{position:absolute!important;right:-1px!important;bottom:-1px!important;width:10px!important;height:10px!important;border-radius:50%!important;background:#4ee39c!important;border:2px solid var(--ks-forest-900)!important}
+.user-info{display:flex!important;flex-direction:column!important;min-width:0!important}
+.user-name{color:#fff!important;font-size:.84rem!important;font-weight:700!important}
+.user-status{margin-top:2px!important;color:rgba(255,255,255,.58)!important;font-size:.72rem!important}
+.main-content{width:calc(100% - 295px)!important;min-height:100vh!important;margin-left:295px!important;padding:0 34px 34px!important;display:flex!important;flex-direction:column!important;gap:0!important;min-width:0!important}
+.toast{border-radius:11px!important;background:#123e2c!important;color:#fff!important;box-shadow:0 12px 30px rgba(10,42,28,.20)!important}
+
+/* shared responsive shell */
+@media (max-width:1100px){
+ .sidebar{width:245px!important}.main-content{width:calc(100% - 245px)!important;margin-left:245px!important;padding-left:26px!important;padding-right:26px!important}
+}
+@media (max-width:900px){
+ body{background:radial-gradient(circle at 100% 0%,rgba(123,217,176,.10),transparent 30%),var(--ks-cream)}
+ .sidebar{position:fixed!important;left:10px!important;right:10px!important;bottom:10px!important;top:auto!important;width:auto!important;height:68px!important;padding:7px 9px!important;border:1px solid rgba(113,211,169,.25)!important;border-radius:18px!important;background:rgba(13,47,33,.97)!important;box-shadow:0 12px 35px rgba(7,35,23,.24)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-direction:row!important;justify-content:center!important}
+ .sidebar-top{width:100%!important;min-width:0!important;flex-direction:row!important;align-items:center!important}
+ .sidebar-logo,.user-profile{display:none!important}
+ .nav-links{width:100%!important;min-width:0!important;padding:0!important;flex-direction:row!important;align-items:stretch!important;justify-content:space-between!important;gap:4px!important}
+ .nav-item{flex:1 1 0!important;min-width:0!important}
+ .nav-item a{width:100%!important;min-width:0!important;min-height:52px!important;padding:6px 3px!important;border-radius:12px!important;flex-direction:column!important;justify-content:center!important;gap:3px!important;text-align:center!important;color:rgba(255,255,255,.76)!important;font-size:.66rem!important;line-height:1.1!important;white-space:normal!important;overflow:hidden!important}
+ .nav-item a span{display:block;max-width:100%;overflow-wrap:anywhere}
+ .nav-item.active a{background:rgba(77,188,141,.24)!important;box-shadow:inset 0 -2px 0 #62d7a4!important}
+ .nav-item.active a::after{display:none!important}
+ .main-content{width:100%!important;min-width:0!important;margin-left:0!important;padding:0 18px 98px!important}
+}
+@media (max-width:520px){
+ .main-content{padding-left:12px!important;padding-right:12px!important;padding-bottom:94px!important}
+ .sidebar{left:7px!important;right:7px!important;bottom:7px!important;height:63px!important;padding:5px 7px!important;border-radius:16px!important}
+ .nav-item a{min-height:51px!important;font-size:.61rem!important}
+}
+
+/* PROFILE */
+.page-header{min-height:112px!important;margin:0 -34px!important;padding:0 34px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #e3ebe7!important;background:rgba(255,255,255,.72)!important;gap:20px!important}.page-header h1{font-size:1.55rem!important;letter-spacing:-.03em!important;color:#12231d!important}.page-header p{margin-top:6px!important;font-size:.77rem!important;color:#6d7e76!important}.profile-grid{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(290px,.8fr)!important;gap:20px!important;align-items:start!important;padding-top:24px!important}.left-column,.right-column{gap:18px!important}.card{min-width:0!important;padding:21px!important;border:1px solid #dfeae4!important;border-radius:17px!important;background:#fff!important;box-shadow:var(--ks-shadow-card)!important}.card-header-group{gap:5px!important}.card-title{font-size:.96rem!important;color:#172820!important}.card-subtitle{font-size:.7rem!important;color:#75847e!important}.profile-header-card{padding:22px!important}.large-avatar{width:62px!important;height:62px!important;border-radius:15px!important;background:#176044!important;box-shadow:0 8px 20px rgba(23,96,68,.16)!important}.profile-details h2{font-size:1.12rem!important}.profile-details p{font-size:.73rem!important}.btn-primary{border-radius:10px!important;background:#176044!important;box-shadow:0 7px 17px rgba(23,96,68,.15)!important}.btn-outline-red{border-radius:10px!important}.fridge-options{gap:9px!important}.fridge-card{border:1px solid #dfeae4!important;border-radius:13px!important;padding:13px 14px!important;background:#fff!important}.fridge-card:hover{border-color:#8dd8b4!important;box-shadow:var(--ks-shadow-soft)!important}.fridge-card.selected{border:2px solid #159a67!important;padding:12px 13px!important;background:#f1fbf6!important}.fridge-card-left{font-size:.79rem!important}.fridge-card-badge{border-radius:999px!important;background:#edf3f0!important;font-size:.63rem!important}.fridge-card.selected .fridge-card-badge{background:#dff5e9!important;color:#176044!important}.toggle-group{gap:14px!important}.toggle-label{font-size:.76rem!important}.toggle-pill.active{background:#176044!important}.form-group{gap:6px!important}.form-label{font-size:.72rem!important;text-transform:uppercase!important;letter-spacing:.02em!important}.form-input{min-height:42px!important;border-radius:11px!important;border-color:#d9e4df!important}.range-slider{accent-color:#176044!important}.account-actions{gap:16px!important}.stat-card{border-radius:15px!important;padding:17px!important;box-shadow:var(--ks-shadow-soft)!important}.stat-card.green{background:#effaf4!important;border:1px solid #cfe9dc!important}.stat-card.teal{background:#effaf9!important;border:1px solid #cce9e4!important}.stat-card.gold{background:#fff8e9!important;border:1px solid #f2dfae!important}.stat-val{font-size:1.42rem!important}.stat-desc{font-size:.7rem!important}.health-box{gap:14px!important}.svg-container{width:132px!important;height:132px!important}.svg-circle-val{stroke:#176044!important}.circle-number{color:#176044!important}.substat-item{border:1px solid #dfeae4!important;border-radius:10px!important;background:#f8fbf9!important;padding:9px 11px!important;font-size:.71rem!important}.green-badge{border-radius:999px!important;background:#e9f8f0!important;color:#176044!important;font-size:.62rem!important}.badges-grid{gap:9px!important}.badge-card{border-radius:12px!important;padding:12px!important}.badge-card.earned{background:#f1fbf6!important;border-color:#bce9d2!important}.badge-card.locked{background:#f8faf8!important}.badge-title{font-size:.73rem!important}.badge-desc{font-size:.64rem!important;line-height:1.35!important}
+@media(max-width:1100px){.page-header{margin-left:-26px!important;margin-right:-26px!important;padding-left:26px!important;padding-right:26px!important}.profile-grid{grid-template-columns:minmax(0,1fr) 290px!important}}
+@media(max-width:900px){.page-header{margin:0 -18px!important;padding:20px 18px!important;min-height:auto!important;align-items:flex-start!important;flex-direction:column!important;gap:5px!important}.page-header h1{font-size:1.42rem!important}.profile-grid{grid-template-columns:minmax(0,1fr)!important;gap:15px!important;padding-top:18px!important}.card{padding:18px!important;border-radius:16px!important}.profile-header-card{flex-direction:column!important;align-items:stretch!important}.profile-header-card .btn-primary{width:100%!important}.large-avatar{width:58px!important;height:58px!important}.badges-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:520px){.page-header{margin-left:-12px!important;margin-right:-12px!important;padding-left:12px!important;padding-right:12px!important;padding-top:18px!important}.page-header h1{font-size:1.3rem!important}.page-header p{font-size:.7rem!important}.profile-grid{padding-top:14px!important}.card{padding:15px!important;border-radius:15px!important}.profile-header-card{gap:13px!important}.profile-user-group{gap:12px!important}.profile-details h2{font-size:1rem!important}.profile-details p{font-size:.67rem!important}.fridge-card{padding:11px 12px!important}.fridge-card.selected{padding:10px 11px!important}.fridge-card-left{font-size:.72rem!important}.stat-card{padding:13px!important}.stat-val{font-size:1.25rem!important}.svg-container{width:118px!important;height:118px!important}.badges-grid{grid-template-columns:1fr!important}.badge-card{padding:11px!important}.account-actions{flex-direction:column!important;align-items:stretch!important}.account-actions .btn-primary,.account-actions .btn-outline-red,.account-actions .delete-link{width:100%!important;text-align:center!important}}
+</style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="sidebar-logo">
+                    <img src="assets/logo-horizontal.png" alt="KitchenSense Logo">
+                </div>
+                <ul class="nav-links">
+                    <li class="nav-item"><a href="dashboard.html">🏠 <span>Dashboard</span></a></li>
+                    <li class="nav-item"><a href="add-item.html">➕ <span>Add Item</span></a></li>
+                    <li class="nav-item"><a href="chat.html">💬 <span>AI Chat</span></a></li>
+                    <li class="nav-item active"><a href="profile.html">👤 <span>Profile</span></a></li>
+                </ul>
+            </div>
+            <div class="user-profile">
+                <div class="avatar-container">
+                    <div class="avatar" id="sidebarAvatar">?</div>
+                    <div class="online-dot"></div>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="sidebarName">User</span>
+                    <span class="user-status">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Profile & Settings</h1>
+                <p>Manage your household preferences, notifications, and storage setups.</p>
+            </header>
+
+            <div class="profile-grid">
+                
+                <!-- LEFT COLUMN -->
+                <div class="left-column">
+                    
+                    <!-- SECTION 1: HEADER CARD -->
+                    <div class="card profile-header-card">
+                        <div class="profile-user-group">
+                            <div class="large-avatar" id="largeAvatar">?</div>
+                            <div class="profile-details">
+                                <h2 id="userNameDisplay">User</h2>
+                                <p id="userEmailDisplay">—</p>
+                                <p>📍 India</p>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="editProfile()">Edit Profile</button>
+                    </div>
+
+                    <!-- SECTION 2: KITCHEN SETUP CARD -->
+                    <div class="card">
+                        <div class="card-header-group">
+                            <h3 class="card-title">🏠 Kitchen Setup</h3>
+                            <p class="card-subtitle">Your storage calibration settings</p>
+                        </div>
+
+                        <div class="fridge-options">
+                            <div class="fridge-card selected" id="fridge-card-standard" onclick="selectFridge('standard')">
+                                <div class="fridge-card-left">
+                                    <span>✅</span>
+                                    <span>Yes, fully functional</span>
+                                </div>
+                                <span class="fridge-card-badge">STANDARD</span>
+                            </div>
+
+                            <div class="fridge-card" id="fridge-card-adjusted" onclick="selectFridge('adjusted')">
+                                <div class="fridge-card-left">
+                                    <span>⚠️</span>
+                                    <span>Yes, but old or not very cold</span>
+                                </div>
+                                <span class="fridge-card-badge">ADJUSTED</span>
+                            </div>
+
+                            <div class="fridge-card" id="fridge-card-pantry" onclick="selectFridge('pantry')">
+                                <div class="fridge-card-left">
+                                    <span>❌</span>
+                                    <span>No refrigerator</span>
+                                </div>
+                                <span class="fridge-card-badge">PANTRY ONLY</span>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" onclick="saveKitchenSettings()">Save Kitchen Settings</button>
+                    </div>
+
+                    <!-- SECTION 3: NOTIFICATIONS PREFERENCES -->
+                    <div class="card">
+                        <div class="card-header-group">
+                            <h3 class="card-title">🔔 Notification Preferences</h3>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle-item">
+                                <span class="toggle-label">Email alerts for expiry</span>
+                                <div class="toggle-pill active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item">
+                                <span class="toggle-label">SMS alerts for expiry</span>
+                                <div class="toggle-pill" onclick="toggleSwitch(this)">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item">
+                                <span class="toggle-label">Daily kitchen summary email</span>
+                                <div class="toggle-pill active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-item">
+                                <span class="toggle-label">AI recipe suggestions email</span>
+                                <div class="toggle-pill active" onclick="toggleSwitch(this)">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slider-group">
+                            <span class="slider-label" id="sliderValueText">Alert timing: 2 days before expiry</span>
+                            <input type="range" min="1" max="7" value="2" class="range-slider" id="alertSlider" oninput="updateSliderText(this.value)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="alertEmail">Alert email address</label>
+                            <input type="email" id="alertEmail" class="form-input" value="">
+                        </div>
+
+                        <button class="btn-primary" onclick="updatePreferences()">Update Preferences</button>
+                    </div>
+
+                    <!-- SECTION 4: ACCOUNT ACTIONS -->
+                    <div class="card">
+                        <div class="account-actions">
+                            <button class="btn-outline-red" onclick="handleLogout()">Logout</button>
+                            <a class="delete-link" onclick="handleDeleteAccount()">Delete Account</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="right-column">
+                    
+                    <!-- SECTION 1: WASTE SAVINGS SUMMARY -->
+                    <div class="card">
+                        <div class="card-header-group">
+                            <h3 class="card-title">♻️ Your Impact</h3>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="stat-card green">
+                                <span class="stat-val">₹1,420</span>
+                                <span class="stat-desc">Food value saved this month</span>
+                            </div>
+
+                            <div class="stat-card teal">
+                                <span class="stat-val">4.2 kg</span>
+                                <span class="stat-desc">Food waste prevented</span>
+                            </div>
+
+                            <div class="stat-card gold">
+                                <span class="stat-val">18 items</span>
+                                <span class="stat-desc">Successfully consumed before expiry</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: PANTRY HEALTH INDEX -->
+                    <div class="card">
+                        <div class="card-header-group">
+                            <h3 class="card-title">Pantry Health Index</h3>
+                            <p class="card-subtitle">Indian household benchmark</p>
+                        </div>
+
+                        <div class="health-box">
+                            <div class="svg-container" id="pantryHealthContainer">
+                                <svg width="140" height="140" viewBox="0 0 120 120">
+                                    <circle class="svg-circle-bg" cx="60" cy="60" r="54"></circle>
+                                    <circle class="svg-circle-val" id="healthProgressCircle" cx="60" cy="60" r="54"></circle>
+                                </svg>
+                                <div class="circle-text-center">
+                                    <span class="circle-number">82%</span>
+                                    <span class="circle-status">Optimal</span>
+                                </div>
+                            </div>
+
+                            <div class="health-substats">
+                                <div class="substat-item">
+                                    <span>Expiry Loss: 1.8%</span>
+                                    <span class="green-badge">&lt; 5% city avg</span>
+                                </div>
+                                <div class="substat-item">
+                                    <span>Turnover Rate: 4.8 days</span>
+                                    <span class="green-badge">Fast replenishment</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: ACHIEVEMENTS -->
+                    <div class="card">
+                        <div class="card-header-group">
+                            <h3 class="card-title">🏆 Achievements</h3>
+                        </div>
+
+                        <div class="badges-grid">
+                            <div class="badge-card earned">
+                                <span class="badge-title">🌱 Zero Waste Week</span>
+                                <span class="badge-desc">7 days with no expired items</span>
+                            </div>
+
+                            <div class="badge-card earned">
+                                <span class="badge-title">🍳 Master Chef</span>
+                                <span class="badge-desc">Used AI recipes 5 times</span>
+                            </div>
+
+                            <div class="badge-card locked">
+                                <span class="badge-title">⚡ Quick Tracker</span>
+                                <span class="badge-desc">Added 10+ items in one session</span>
+                            </div>
+
+                            <div class="badge-card locked">
+                                <span class="badge-title">🏆 Waste Warrior</span>
+                                <span class="badge-desc">Saved ₹5000 in food value</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedFridgeType = 'standard';
+
+        /* 1. FRIDGE SELECTION */
+        function selectFridge(type) {
+            selectedFridgeType = type;
+            ['standard', 'adjusted', 'pantry'].forEach(t => {
+                const card = document.getElementById(`fridge-card-${t}`);
+                if (t === type) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        /* 2. TOGGLE SWITCHES */
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        /* 3. SLIDER UPDATE */
+        function updateSliderText(val) {
+            document.getElementById('sliderValueText').innerText = `Alert timing: ${val} days before expiry`;
+        }
+
+        /* 4. CIRCULAR PROGRESS ANIMATION */
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('userName');
+            const savedEmail = localStorage.getItem('userEmail');
+            const savedFridge = localStorage.getItem('fridgeStatus');
+
+            if (savedName) {
+                initializeSidebarUser();
+                document.getElementById('largeAvatar').textContent = getUserInitials(savedName);
+                document.getElementById('userNameDisplay').textContent = savedName;
+            }
+            if (savedEmail) {
+                document.getElementById('userEmailDisplay').textContent = savedEmail;
+                document.getElementById('alertEmail').value = savedEmail;
+            }
+            if (savedFridge) selectFridge(savedFridge);
+
+            const circle = document.getElementById('healthProgressCircle');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        circle.style.strokeDashoffset = '61.08';
+                    }
+                });
+            }, { threshold: 0.5 });
+            observer.observe(document.getElementById('pantryHealthContainer'));
+        });
+
+        /* 5. SAVE KITCHEN SETTINGS
+           TODO: Update Cognito custom attribute fridge_status via API
+        */
+        function saveKitchenSettings() {
+            localStorage.setItem('fridgeStatus', selectedFridgeType);
+            showToast('✓ Kitchen settings saved!');
+        }
+
+        /* 6. UPDATE PREFERENCES
+           TODO: Update SNS subscription preferences via API
+        */
+        function updatePreferences() {
+            showToast('✓ Notification preferences updated!');
+        }
+
+        /* 7. LOGOUT
+           TODO: Call Cognito signOut() from auth.js
+        */
+        function handleLogout() {
+            window.location.href = 'auth.html';
+        }
+
+        function handleDeleteAccount() {
+            if (confirm('Are you sure you want to delete your KitchenSense account? This cannot be undone.')) {
+                alert('Account deletion requested.');
+                window.location.href = 'auth.html';
+            }
+        }
+
+        function editProfile() {
+            const currentName = document.getElementById('userNameDisplay').innerText;
+            const newName = prompt("Enter your name:", currentName);
+            if (newName) {
+                document.getElementById('userNameDisplay').innerText = newName;
+                localStorage.setItem('userName', newName);
+                document.getElementById('largeAvatar').textContent = getUserInitials(newName);
+                initializeSidebarUser();
+                showToast('✓ Profile updated!');
+            }
+        }
+
+        /* TOAST UTILITY */
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitchenSense - Add Item</title>
+    <link rel="icon" type="image/png" href="assets/logo-stacked.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/api.js"></script>
+    <style>
+
+/* =========================================================
+   KitchenSense — Add Item
+   Visual redesign inspired by the provided desktop reference.
+   Content, labels, links, IDs and JavaScript are unchanged.
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --forest-950: #09261a;
+    --forest-900: #0d2f21;
+    --forest-850: #103a29;
+    --forest-800: #144632;
+    --forest-700: #176044;
+    --forest-600: #21805b;
+    --mint-500: #55c79a;
+    --mint-400: #7bd9b0;
+    --mint-200: #c9f3df;
+    --mint-100: #e9faf2;
+    --cream: #f7faf8;
+    --white: #ffffff;
+    --ink: #14251f;
+    --muted: #667a71;
+    --muted-2: #8a9b94;
+    --line: #dfeae4;
+    --line-strong: #cfddd6;
+    --red: #ef5b67;
+    --amber: #e5a52d;
+    --shadow-card: 0 10px 28px rgba(18, 52, 38, .07);
+    --shadow-soft: 0 5px 16px rgba(18, 52, 38, .05);
+}
+
+html {
+    min-height: 100%;
+    background: var(--cream);
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 72% 8%, rgba(123, 217, 176, .10), transparent 25%),
+        var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================
+   APPLICATION LAYOUT
+   ========================= */
+
+.app-container {
+    width: 100%;
+    min-height: 100vh;
+    display: block;
+}
+
+/* =========================
+   SIDEBAR — reference style
+   ========================= */
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 100;
+    width: 295px;
+    height: 100vh;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: var(--forest-900);
+    color: #fff;
+    border-right: 1px solid rgba(255,255,255,.05);
+    box-shadow: 10px 0 28px rgba(8, 35, 24, .05);
+}
+
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+}
+
+.sidebar-logo {
+    min-height: 82px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.sidebar-logo img {
+    display: block;
+    width: auto;
+    max-width: 205px;
+    height: 40px;
+    object-fit: contain;
+    filter: none;
+}
+
+/* Keep the existing navigation information; only restyle it. */
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 18px 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    min-width: 0;
+}
+
+.nav-item a {
+    min-height: 48px;
+    width: 100%;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,.78);
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: .92rem;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+
+.nav-item a:hover {
+    background: rgba(85,199,154,.12);
+    color: #fff;
+    transform: translateX(1px);
+}
+
+.nav-item.active a {
+    color: #fff;
+    background: linear-gradient(90deg, rgba(63,157,111,.68), rgba(63,157,111,.40));
+    box-shadow: inset 0 0 0 1px rgba(105,218,167,.32);
+    font-weight: 700;
+}
+
+.nav-item.active a::after {
+    content: "›";
+    margin-left: auto;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #bdf1d9;
+}
+
+/* Existing "Start" badge, if present elsewhere in the markup. */
+.nav-item a .start,
+.nav-item a .badge {
+    margin-left: auto;
+}
+
+.user-profile {
+    margin: 0;
+    padding: 15px 20px 20px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.avatar-container {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #21b77d;
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 800;
+    box-shadow: 0 5px 16px rgba(33,183,125,.20);
+}
+
+.online-dot {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4ee39c;
+    border: 2px solid var(--forest-900);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-name {
+    color: #fff;
+    font-size: .84rem;
+    font-weight: 700;
+}
+
+.user-status {
+    margin-top: 2px;
+    color: rgba(255,255,255,.58);
+    font-size: .72rem;
+}
+
+/* =========================
+   MAIN AREA
+   ========================= */
+
+.main-content {
+    width: calc(100% - 295px);
+    min-height: 100vh;
+    margin-left: 295px;
+    padding: 0 34px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Turn the existing breadcrumb into the reference's slim top bar. */
+.breadcrumb {
+    min-height: 64px;
+    margin: 0 -34px 0;
+    padding: 0 34px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e3ebe7;
+    color: #53685f;
+    background: rgba(255,255,255,.72);
+    font-size: .82rem;
+    font-weight: 500;
+}
+
+.page-header {
+    width: 100%;
+    padding: 34px 0 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    border-bottom: 1px solid #e3ebe7;
+}
+
+.page-title {
+    min-width: 0;
+}
+
+.page-title h1 {
+    margin: 0;
+    color: #12231d;
+    font-size: clamp(1.65rem, 2.1vw, 2.05rem);
+    line-height: 1.15;
+    letter-spacing: -.035em;
+    font-weight: 750;
+}
+
+.page-title p {
+    max-width: 650px;
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: .86rem;
+    line-height: 1.55;
+}
+
+.info-card-badge {
+    flex: 0 1 auto;
+    min-height: 46px;
+    max-width: 410px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #aee7cd;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #effbf5, #f8fcfa);
+    color: #176044;
+    box-shadow: 0 4px 15px rgba(40,139,96,.05);
+    font-size: .76rem;
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+/* =========================
+   TYPE TOGGLE
+   ========================= */
+
+.type-toggle-container {
+    width: 100%;
+    max-width: 625px;
+    margin: 24px 0;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 4px;
+    border: 1px solid #dbe7e1;
+    border-radius: 14px;
+    background: #eef3f1;
+}
+
+.type-toggle-btn {
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #415a50;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: .82rem;
+    font-weight: 650;
+    white-space: nowrap;
+    transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.type-toggle-btn:hover {
+    background: rgba(255,255,255,.72);
+}
+
+.type-toggle-btn.active {
+    background: #1d6c4d;
+    color: #fff;
+    box-shadow: 0 5px 13px rgba(29,108,77,.18);
+}
+
+/* =========================
+   CONTENT GRID
+   ========================= */
+
+.content-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(290px, 31%);
+    gap: 28px;
+    align-items: start;
+}
+
+/* =========================
+   FORM CARD
+   ========================= */
+
+.form-section {
+    min-width: 0;
+    padding: 27px 26px 24px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: var(--shadow-card);
+}
+
+.form-group {
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-section form {
+    min-width: 0;
+}
+
+.label-row {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.form-label {
+    color: #1a2b24;
+    font-size: .76rem;
+    line-height: 1.3;
+    font-weight: 750;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+}
+
+.label-helper {
+    color: #94a49d;
+    font-size: .69rem;
+    line-height: 1.35;
+    text-align: right;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 13px;
+    border: 1px solid #d9e4df;
+    border-radius: 11px;
+    outline: none;
+    background: #fff;
+    color: #172820;
+    font-size: .82rem;
+    font-weight: 500;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.form-input::placeholder {
+    color: #a0ada7;
+}
+
+.form-input:hover,
+.form-select:hover {
+    border-color: #c2d3cb;
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: #55c79a;
+    box-shadow: 0 0 0 3px rgba(85,199,154,.12);
+}
+
+input[type="date"] {
+    color-scheme: light;
+}
+
+input[type="checkbox"] {
+    accent-color: #167a55;
+}
+
+.chips-row {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 1px;
+}
+
+.chip-btn {
+    max-width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d8e5df;
+    border-radius: 999px;
+    background: #f8fbf9;
+    color: #245943;
+    cursor: pointer;
+    font-size: .68rem;
+    line-height: 1.25;
+    font-weight: 650;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.chip-btn:hover {
+    background: #eaf8f1;
+    border-color: #9fddbf;
+    transform: translateY(-1px);
+}
+
+.grid-2 {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+}
+
+/* =========================
+   STORAGE CARDS
+   ========================= */
+
+.storage-cards {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 11px;
+}
+
+.storage-card {
+    min-width: 0;
+    min-height: 78px;
+    padding: 12px 12px 11px;
+    border: 1px solid #dce7e2;
+    border-radius: 13px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.storage-card:hover {
+    border-color: #8dd8b4;
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+}
+
+.storage-card.selected {
+    border: 2px solid #159a67;
+    padding: 11px 11px 10px;
+    background: #f1fbf6;
+    box-shadow: inset 0 0 0 1px rgba(21,154,103,.04);
+}
+
+.storage-title {
+    min-width: 0;
+    color: #1a2b24;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    line-height: 1.3;
+    font-weight: 750;
+}
+
+.storage-desc {
+    color: #71837b;
+    font-size: .66rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+/* =========================
+   AI ADVISOR
+   ========================= */
+
+.ai-advisor-panel {
+    min-width: 0;
+    padding: 22px 20px;
+    border: 1px solid #b9ead2;
+    border-radius: 19px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(103,199,154,.18), transparent 45%),
+        linear-gradient(145deg, #f1fcf6 0%, #e8f8f0 100%);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ai-header-badge {
+    align-self: flex-start;
+    max-width: 100%;
+    padding: 7px 10px;
+    border: 1px solid rgba(83,190,143,.22);
+    border-radius: 8px;
+    background: rgba(215,246,231,.78);
+    color: #15543c;
+    font-size: .69rem;
+    line-height: 1.3;
+    font-weight: 750;
+}
+
+.tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.tip-item {
+    min-width: 0;
+    padding: 14px 13px;
+    border: 1px solid #bfeeda;
+    border-radius: 14px;
+    background: #fff;
+    color: #50655b;
+    font-size: .73rem;
+    line-height: 1.55;
+    box-shadow: 0 5px 16px rgba(24,72,52,.035);
+}
+
+.tip-item strong {
+    color: #15271f;
+    font-weight: 750;
+}
+
+.ai-footer-note {
+    padding-top: 2px;
+    color: #39866a;
+    font-size: .69rem;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.bottom-actions {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #e5ece8;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-buttons {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex-wrap: wrap;
+}
+
+.submit-main-btn,
+.submit-outline-btn {
+    min-height: 42px;
+    padding: 10px 17px;
+    border-radius: 11px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: .78rem;
+    line-height: 1.2;
+    font-weight: 700;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.submit-main-btn {
+    border: 1px solid #176044;
+    background: #176044;
+    color: #fff;
+    box-shadow: 0 7px 17px rgba(23,96,68,.17);
+}
+
+.submit-main-btn:hover {
+    background: #0f4b35;
+    transform: translateY(-1px);
+    box-shadow: 0 9px 21px rgba(23,96,68,.21);
+}
+
+.submit-outline-btn {
+    border: 1px solid #c7d9d1;
+    background: #fff;
+    color: #173b2d;
+}
+
+.submit-outline-btn:hover {
+    border-color: #82cba8;
+    background: #f3fbf7;
+    transform: translateY(-1px);
+}
+
+.clear-link {
+    padding: 8px 4px;
+    color: #7a8b84;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: .74rem;
+    font-weight: 550;
+}
+
+.clear-link:hover {
+    color: #176044;
+    text-decoration: underline;
+}
+
+.action-subnote {
+    color: #91a19a;
+    font-size: .67rem;
+    line-height: 1.45;
+}
+
+.spinner {
+    width: 15px;
+    height: 15px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-top-color: transparent;
+    border-radius: 50%;
+    display: none;
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =========================
+   TOAST
+   ========================= */
+
+.toast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 300;
+    display: none;
+    padding: 12px 17px;
+    border-radius: 11px;
+    background: #123e2c;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    box-shadow: 0 12px 30px rgba(10,42,28,.20);
+    animation: fadeIn .25s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   RESPONSIVE — TABLET
+   ========================= */
+
+@media (max-width: 1100px) {
+    .sidebar {
+        width: 245px;
+    }
+
+    .main-content {
+        width: calc(100% - 245px);
+        margin-left: 245px;
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+
+    .breadcrumb {
+        margin-left: -26px;
+        margin-right: -26px;
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+
+    .content-grid {
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 20px;
+    }
+
+    .storage-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================
+   RESPONSIVE — MOBILE
+   ========================= */
+
+@media (max-width: 900px) {
+    body {
+        background:
+            radial-gradient(circle at 100% 0%, rgba(123,217,176,.10), transparent 30%),
+            var(--cream);
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        top: auto;
+        width: auto;
+        height: 68px;
+        padding: 7px 9px;
+        border: 1px solid rgba(113,211,169,.25);
+        border-radius: 18px;
+        background: rgba(13,47,33,.97);
+        box-shadow: 0 12px 35px rgba(7,35,23,.24);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .sidebar-top {
+        width: 100%;
+        min-width: 0;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .sidebar-logo,
+    .user-profile {
+        display: none;
+    }
+
+    .nav-links {
+        width: 100%;
+        min-width: 0;
+        padding: 0;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 4px;
+    }
+
+    .nav-item {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .nav-item a {
+        width: 100%;
+        min-width: 0;
+        min-height: 52px;
+        padding: 6px 3px;
+        border-radius: 12px;
+        flex-direction: column;
+        justify-content: center;
+        gap: 3px;
+        text-align: center;
+        color: rgba(255,255,255,.76);
+        font-size: .66rem;
+        line-height: 1.1;
+        white-space: normal;
+        overflow: hidden;
+    }
+
+    .nav-item a span {
+        display: block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .nav-item.active a {
+        background: rgba(77,188,141,.24);
+        box-shadow: inset 0 -2px 0 #62d7a4;
+    }
+
+    .nav-item.active a::after {
+        display: none;
+    }
+
+    .main-content {
+        width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        padding: 0 18px 98px;
+    }
+
+    .breadcrumb {
+        min-height: 55px;
+        margin: 0 -18px;
+        padding: 0 18px;
+        background: rgba(255,255,255,.80);
+        font-size: .75rem;
+    }
+
+    .page-header {
+        padding: 25px 0 18px;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .page-title h1 {
+        font-size: 1.48rem;
+    }
+
+    .page-title p {
+        margin-top: 7px;
+        font-size: .79rem;
+    }
+
+    .info-card-badge {
+        width: 100%;
+        max-width: none;
+        font-size: .71rem;
+    }
+
+    .type-toggle-container {
+        max-width: none;
+        margin: 18px 0;
+        grid-template-columns: 1fr 1.25fr;
+    }
+
+    .type-toggle-btn {
+        min-height: 42px;
+        padding: 8px 7px;
+        font-size: .72rem;
+        white-space: normal;
+        line-height: 1.25;
+    }
+
+    .content-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 17px;
+    }
+
+    .form-section {
+        padding: 20px 17px 18px;
+        border-radius: 16px;
+    }
+
+    .grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 15px;
+    }
+
+    .storage-cards {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
+    }
+
+    .storage-card {
+        min-height: 67px;
+    }
+
+    .ai-advisor-panel {
+        padding: 18px 16px;
+        border-radius: 16px;
+    }
+
+    .action-buttons {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .submit-main-btn,
+    .submit-outline-btn,
+    .clear-link {
+        width: 100%;
+        min-height: 43px;
+    }
+
+    .clear-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .toast {
+        left: 14px;
+        right: 14px;
+        bottom: 86px;
+        text-align: center;
+    }
+}
+
+/* =========================
+   RESPONSIVE — SMALL PHONES
+   ========================= */
+
+@media (max-width: 520px) {
+    .main-content {
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-bottom: 94px;
+    }
+
+    .breadcrumb {
+        margin-left: -12px;
+        margin-right: -12px;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .page-header {
+        padding-top: 22px;
+    }
+
+    .page-title h1 {
+        font-size: 1.32rem;
+    }
+
+    .page-title p {
+        font-size: .76rem;
+    }
+
+    .info-card-badge {
+        padding: 9px 10px;
+    }
+
+    .type-toggle-container {
+        grid-template-columns: 1fr 1.15fr;
+    }
+
+    .form-section {
+        padding: 17px 14px;
+        border-radius: 15px;
+    }
+
+    .label-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .label-helper {
+        text-align: left;
+    }
+
+    .form-label {
+        font-size: .72rem;
+    }
+
+    .form-input,
+    .form-select {
+        min-height: 43px;
+        font-size: .79rem;
+    }
+
+    .chips-row {
+        gap: 6px;
+    }
+
+    .chip-btn {
+        padding: 6px 9px;
+        font-size: .65rem;
+    }
+
+    .ai-advisor-panel {
+        padding: 16px 14px;
+    }
+
+    .tip-item {
+        padding: 12px;
+        font-size: .70rem;
+    }
+
+    .nav-item a {
+        font-size: .61rem;
+    }
+
+    .sidebar {
+        left: 7px;
+        right: 7px;
+        bottom: 7px;
+        height: 63px;
+        padding: 5px 7px;
+        border-radius: 16px;
+    }
+
+    .nav-item a {
+        min-height: 51px;
+    }
+}
+
+/* Prevent accidental horizontal overflow from long user-entered text. */
+.form-section *,
+.ai-advisor-panel *,
+.main-content * {
+    overflow-wrap: break-word;
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+</style>
+
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="sidebar-logo">
+                    <img src="assets/logo-horizontal.png" alt="KitchenSense Logo">
+                </div>
+                <ul class="nav-links">
+                    <li class="nav-item"><a href="dashboard.html">🏠 <span>Dashboard</span></a></li>
+                    <li class="nav-item active"><a href="add-item.html">➕ <span>Add Item</span></a></li>
+                    <li class="nav-item"><a href="chat.html">💬 <span>AI Chat</span></a></li>
+                    <li class="nav-item"><a href="profile.html">👤 <span>Profile</span></a></li>
+                </ul>
+            </div>
+            <div class="user-profile">
+                <div class="avatar-container">
+                    <div class="avatar" id="sidebarAvatar">?</div>
+                    <div class="online-dot"></div>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="sidebarName">User</span>
+                    <span class="user-status">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <div class="breadcrumb">Pantry › New Entry</div>
+
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Add Kitchen Item</h1>
+                    <p>Log new groceries, staple refills, or fresh cooked batches.</p>
+                </div>
+                <div class="info-card-badge">
+                    <span>📡</span> Zero-Waste Radar — Track items to reduce household food waste
+                </div>
+            </header>
+
+            <!-- ITEM TYPE TOGGLE -->
+            <div class="type-toggle-container">
+                <button class="type-toggle-btn active" id="tabPackaged" onclick="switchFormTab('PACKAGED')">
+                    📦 Packaged Food
+                </button>
+                <button class="type-toggle-btn" id="tabHomemade" onclick="switchFormTab('HOMEMADE')">
+                    🍳 Homemade / Cooked Meal
+                </button>
+            </div>
+
+            <div class="content-grid">
+                <!-- FORM CONTAINER -->
+                <div class="form-section">
+                    <!-- PACKAGED FORM -->
+                    <form id="packagedForm" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label class="form-label" for="pkgName">Item Name & Brand</label>
+                                <span class="label-helper">e.g. Dahi, Paneer, Atta</span>
+                            </div>
+                            <input type="text" id="pkgName" class="form-input" placeholder="e.g. Toned Milk, Wheat Flour" required>
+                            <div class="chips-row">
+                                <button type="button" class="chip-btn" onclick="fillInput('pkgName', 'Toned Milk')">+ Toned Milk</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('pkgName', 'Paneer')">+ Paneer</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('pkgName', 'Curd / Dahi')">+ Curd / Dahi</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('pkgName', 'Wheat Flour')">+ Wheat Flour</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('pkgName', 'Bread')">+ Bread</button>
+                            </div>
+                        </div>
+
+                        <div class="grid-2" style="margin-top: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="pkgCategory">Category Classification</label>
+                                <select id="pkgCategory" class="form-select">
+                                    <option>Dairy & Eggs</option>
+                                    <option>Vegetables & Fruits</option>
+                                    <option>Grains & Pulses</option>
+                                    <option>Snacks & Packaged</option>
+                                    <option>Cooked Food</option>
+                                    <option>Beverages</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quantity & Unit</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="number" id="pkgQty" class="form-input" value="1" min="1" style="width: 70px;">
+                                    <select id="pkgUnit" class="form-select" style="flex: 1;">
+                                        <option>Packet(s)</option>
+                                        <option>Kg</option>
+                                        <option>Litre(s)</option>
+                                        <option>Piece(s)</option>
+                                        <option>Box(es)</option>
+                                        <option>Bag(s)</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px;">
+                            <div class="label-row">
+                                <label class="form-label" for="pkgExpiry">Expiry / Best Before Date</label>
+                                <label style="font-size: 0.75rem; color: var(--primary-dark); display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" checked> Auto-alert 24h prior
+                                </label>
+                            </div>
+                            <input type="date" id="pkgExpiry" class="form-input" required>
+                            <div class="chips-row">
+                                <button type="button" class="chip-btn" onclick="addDaysToExpiry('pkgExpiry', 3)">+3 Days</button>
+                                <button type="button" class="chip-btn" onclick="addDaysToExpiry('pkgExpiry', 7)">+1 Week</button>
+                                <button type="button" class="chip-btn" onclick="addDaysToExpiry('pkgExpiry', 30)">+1 Month</button>
+                                <button type="button" class="chip-btn" onclick="addDaysToExpiry('pkgExpiry', 180)">+6 Months</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px;">
+                            <label class="form-label">Storage Location in Kitchen</label>
+                            <div class="storage-cards">
+                                <div class="storage-card selected" id="pkg-card-fridge" onclick="selectStorage('pkg', 'FRIDGE')">
+                                    <div class="storage-title">🧊 Refrigerator</div>
+                                    <div class="storage-desc">Chiller Tray / Side Door Shelf</div>
+                                </div>
+                                <div class="storage-card" id="pkg-card-freezer" onclick="selectStorage('pkg', 'FREEZER')">
+                                    <div class="storage-title">❄️ Deep Freezer</div>
+                                    <div class="storage-desc">-18°C Frozen Veg / Purees</div>
+                                </div>
+                                <div class="storage-card" id="pkg-card-shelf" onclick="selectStorage('pkg', 'SHELF')">
+                                    <div class="storage-title">🏺 Dry Shelf</div>
+                                    <div class="storage-desc">Airtight Pantry Container</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- HOMEMADE FORM -->
+                    <form id="homemadeForm" style="display: none;" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label class="form-label" for="homeName">Item Name</label>
+                            <input type="text" id="homeName" class="form-input" placeholder="e.g. Dal Tadka, Idli Batter" required>
+                            <div class="chips-row">
+                                <button type="button" class="chip-btn" onclick="fillInput('homeName', 'Dal Tadka')">+ Dal Tadka</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('homeName', 'Idli Batter')">+ Idli Batter</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('homeName', 'Rajma')">+ Rajma</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('homeName', 'Cooked Rice')">+ Cooked Rice</button>
+                                <button type="button" class="chip-btn" onclick="fillInput('homeName', 'Sabzi')">+ Sabzi</button>
+                            </div>
+                        </div>
+
+                        <div class="grid-2" style="margin-top: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">Quantity & Unit</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="number" id="homeQty" class="form-input" value="1" min="1" style="width: 70px;">
+                                    <select id="homeUnit" class="form-select" style="flex: 1;">
+                                        <option>Box(es)</option>
+                                        <option>Bowl(s)</option>
+                                        <option>Katori(s)</option>
+                                        <option>Kg</option>
+                                        <option>Litre(s)</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="homeDateCooked">Date Cooked</label>
+                                <input type="date" id="homeDateCooked" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px;">
+                            <div class="label-row">
+                                <label class="form-label" for="homeShelfLife">Shelf Life (days)</label>
+                                <span class="label-helper">How many days before this goes bad?</span>
+                            </div>
+                            <input type="number" id="homeShelfLife" class="form-input" value="2" min="1">
+                            <div class="chips-row">
+                                <button type="button" class="chip-btn" onclick="setShelfLife(1)">1 day</button>
+                                <button type="button" class="chip-btn" onclick="setShelfLife(2)">2 days</button>
+                                <button type="button" class="chip-btn" onclick="setShelfLife(3)">3 days</button>
+                                <button type="button" class="chip-btn" onclick="setShelfLife(5)">5 days</button>
+                                <button type="button" class="chip-btn" onclick="setShelfLife(7)">7 days</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 16px;">
+                            <label class="form-label">Storage Location in Kitchen</label>
+                            <div class="storage-cards">
+                                <div class="storage-card selected" id="home-card-fridge" onclick="selectStorage('home', 'FRIDGE')">
+                                    <div class="storage-title">🧊 Refrigerator</div>
+                                    <div class="storage-desc">Chiller Tray / Side Door Shelf</div>
+                                </div>
+                                <div class="storage-card" id="home-card-freezer" onclick="selectStorage('home', 'FREEZER')">
+                                    <div class="storage-title">❄️ Deep Freezer</div>
+                                    <div class="storage-desc">-18°C Frozen Veg / Purees</div>
+                                </div>
+                                <div class="storage-card" id="home-card-shelf" onclick="selectStorage('home', 'SHELF')">
+                                    <div class="storage-title">🏺 Dry Shelf</div>
+                                    <div class="storage-desc">Airtight Pantry Container</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- BOTTOM ACTIONS -->
+                    <div class="bottom-actions">
+                        <div class="action-buttons">
+                            <button type="button" class="submit-main-btn" onclick="submitForm(false)">
+                                <span id="submitBtnText">✓ Add to KitchenSense</span>
+                                <div class="spinner" id="submitSpinner"></div>
+                            </button>
+                            <button type="button" class="submit-outline-btn" onclick="submitForm(true)">
+                                Save & Add Another
+                            </button>
+                            <a class="clear-link" onclick="clearForm()">Clear Values</a>
+                        </div>
+                        <span class="action-subnote">Smart notifications warn you 24h before expiry</span>
+                    </div>
+                </div>
+
+                <!-- RIGHT AI ADVISOR PANEL -->
+                <aside class="ai-advisor-panel">
+                    <span class="ai-header-badge">✨ AI Storage Advisor — Indian Kitchen Context</span>
+                    
+                    <div class="tips-list">
+                        <div class="tip-item">
+                            <strong>Toned Milk</strong> — Lasts 24-36 hours in refrigerator middle shelf.
+                        </div>
+                        <div class="tip-item">
+                            <strong>Fresh Coriander / Dhaniya</strong> — Trim dry roots, place stem-down in damp muslin cloth. Extends freshness up to 8 days.
+                        </div>
+                        <div class="tip-item">
+                            <strong>Atta Weevils Prevention</strong> — Add 3-4 dried tejpatta (bay leaves) into the steel airtight drum.
+                        </div>
+                    </div>
+
+                    <div class="ai-footer-note">
+                        AI dynamically recalculates shelf life as humidity shifts.
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">✓ Item added to your kitchen!</div>
+
+    <script>
+        let currentTab = 'PACKAGED';
+        let selectedStoragePkg = 'FRIDGE';
+        let selectedStorageHome = 'FRIDGE';
+
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSidebarUser();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('homeDateCooked').value = today;
+            
+            // Default 3 days for packaged
+            addDaysToExpiry('pkgExpiry', 3);
+        });
+
+        /* TAB TOGGLE */
+        function switchFormTab(tab) {
+            currentTab = tab;
+            const tabPkg = document.getElementById('tabPackaged');
+            const tabHome = document.getElementById('tabHomemade');
+            const formPkg = document.getElementById('packagedForm');
+            const formHome = document.getElementById('homemadeForm');
+
+            if (tab === 'PACKAGED') {
+                tabPkg.classList.add('active');
+                tabHome.classList.remove('active');
+                formPkg.style.display = 'block';
+                formHome.style.display = 'none';
+            } else {
+                tabHome.classList.add('active');
+                tabPkg.classList.remove('active');
+                formHome.style.display = 'block';
+                formPkg.style.display = 'none';
+            }
+        }
+
+        /* QUICK PICK FILLERS */
+        function fillInput(inputId, text) {
+            document.getElementById(inputId).value = text;
+        }
+
+        function setShelfLife(days) {
+            document.getElementById('homeShelfLife').value = days;
+        }
+
+        /* DATE CALCULATION */
+        function addDaysToExpiry(inputId, days) {
+            const date = new Date();
+            date.setDate(date.getDate() + days);
+            const formattedDate = date.toISOString().split('T')[0];
+            document.getElementById(inputId).value = formattedDate;
+        }
+
+        /* STORAGE SELECTION */
+        function selectStorage(prefix, type) {
+            if (prefix === 'pkg') {
+                selectedStoragePkg = type;
+            } else {
+                selectedStorageHome = type;
+            }
+
+            ['fridge', 'freezer', 'shelf'].forEach(loc => {
+                const card = document.getElementById(`${prefix}-card-${loc}`);
+                if (loc.toUpperCase() === type) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+
+        /* FORM SUBMISSION
+           TODO: Replace with POST /items API call
+        */
+        async function submitForm(addAnother) {
+            let isValid = false;
+            let itemPayload = {};
+
+            if (currentTab === 'PACKAGED') {
+                const name = document.getElementById('pkgName').value.trim();
+                const expiry = document.getElementById('pkgExpiry').value;
+                const qty = document.getElementById('pkgQty').value;
+                const unit = document.getElementById('pkgUnit').value;
+                if (name && expiry) {
+                    isValid = true;
+                    itemPayload = {
+                        itemName: name,
+                        itemType: 'PACKAGED',
+                        expiryDate: expiry,
+                        quantity: qty + ' ' + unit,
+                        storageLocation: selectedStoragePkg
+                    };
+                }
+            } else {
+                const name = document.getElementById('homeName').value.trim();
+                const cooked = document.getElementById('homeDateCooked').value;
+                const shelf = document.getElementById('homeShelfLife').value;
+                const qty = document.getElementById('homeQty').value;
+                const unit = document.getElementById('homeUnit').value;
+                if (name && cooked) {
+                    isValid = true;
+                    itemPayload = {
+                        itemName: name,
+                        itemType: 'HOMEMADE',
+                        cookDate: cooked,
+                        shelfLifeDays: parseInt(shelf),
+                        quantity: qty + ' ' + unit,
+                        storageLocation: selectedStorageHome
+                    };
+                }
+            }
+
+            if (!isValid) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            const btnText = document.getElementById('submitBtnText');
+            const spinner = document.getElementById('submitSpinner');
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+
+            try {
+                await apiAddItem(itemPayload);
+                showToast();
+                if (addAnother) {
+                    clearForm();
+                } else {
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+                }
+            } catch(e) {
+                alert('Failed to add item. Please try again.');
+                console.error(e);
+            } finally {
+                btnText.style.display = 'inline';
+                spinner.style.display = 'none';
+            }
+        }
+
+        /* CLEAR FORM */
+        function clearForm() {
+            document.getElementById('packagedForm').reset();
+            document.getElementById('homemadeForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('homeDateCooked').value = today;
+            addDaysToExpiry('pkgExpiry', 3);
+            selectStorage('pkg', 'FRIDGE');
+            selectStorage('home', 'FRIDGE');
+        }
+
+        /* TOAST */
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

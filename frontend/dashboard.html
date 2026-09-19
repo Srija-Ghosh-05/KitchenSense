@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitchenSense - Dashboard</title>
+    <link rel="icon" type="image/png" href="assets/logo-stacked.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/api.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        :root {
+            --primary-dark: #2d6a4f;
+            --light-green: #52b788;
+            --bg-color: #f8faf8;
+            --white: #ffffff;
+            --text-dark: #1a2e1a;
+            --text-grey: #4a5568;
+            --red-urgent: #ef4444;
+            --amber-warning: #f59e0b;
+            --teal-fresh: #0d9488;
+            --gold-value: #d97706;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* LAYOUT CONTAINER */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .sidebar-logo {
+            padding: 0 8px;
+        }
+
+        .sidebar-logo img {
+            height: 32px;
+            filter: brightness(0) invert(1);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .nav-item.active a {
+            background-color: var(--light-green);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .avatar-container {
+            position: relative;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--light-green);
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #22c55e;
+            border: 2px solid var(--primary-dark);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .user-status {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            width: 100%;
+            min-width: 0;
+            padding: 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            max-width: 1200px;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .greeting h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .greeting p {
+            font-size: 0.875rem;
+            color: var(--text-grey);
+            margin-top: 2px;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .radar-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #e8f5e9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .notification-bell {
+            position: relative;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .notification-bell:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--red-urgent);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        /* SECTION 1 — CONSUME FIRST BANNER */
+        .consume-banner {
+            background: linear-gradient(135deg, #fef2f2 0%, #fffbebe6 100%);
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .banner-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+        }
+
+        .banner-icon {
+            font-size: 1.5rem;
+        }
+
+        .banner-title {
+            font-weight: 700;
+            color: #991b1b;
+            font-size: 0.95rem;
+        }
+
+        .banner-sub {
+            font-size: 0.8rem;
+            color: #7f1d1d;
+        }
+
+        .urgent-chips {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 0;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .urgent-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            background: var(--white);
+            border: 1px solid #fca5a5;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .chip-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .chip-badge.today {
+            background-color: #fee2e2;
+            color: var(--red-urgent);
+        }
+
+        .chip-badge.tomorrow {
+            background-color: #fef3c7;
+            color: var(--gold-value);
+        }
+
+        /* SECTION 2 — STATS ROW */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            padding: 18px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-grey);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-grey);
+        }
+
+        .stat-card.expiring .stat-value { color: var(--red-urgent); }
+        .stat-card.good .stat-value { color: var(--primary-dark); }
+        .stat-card.fresh .stat-value { color: var(--teal-fresh); }
+        .stat-card.saved .stat-value { color: var(--gold-value); }
+
+        /* SECTION 3 — FILTER TABS + SEARCH */
+        .controls-row {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .search-bar {
+            width: 100%;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            background-color: var(--white);
+            transition: border-color 0.2s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--light-green);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-grey);
+            font-size: 1rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 24px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-item {
+            padding-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-grey);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .tab-item.active {
+            color: var(--primary-dark);
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-dark);
+        }
+
+        .tab-count {
+            background-color: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .tab-item.active .tab-count {
+            background-color: #e8f5e9;
+            color: var(--primary-dark);
+        }
+
+        /* SECTION 4 — FOOD ITEMS LIST */
+        .list-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .sort-label {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+        }
+
+        .items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .food-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            border-left-width: 5px;
+        }
+
+        .food-card:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .food-card.border-red { border-left-color: var(--red-urgent); }
+        .food-card.border-amber { border-left-color: var(--amber-warning); }
+        .food-card.border-green { border-left-color: var(--light-green); }
+
+        .card-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .food-emoji-bg {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background-color: #f0fdf4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .food-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .type-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .type-badge.packaged { background-color: #e0f2fe; color: #0284c7; }
+        .type-badge.homemade { background-color: #dcfce7; color: #15803d; }
+        .type-badge.fresh { background-color: #ccfbf1; color: #0f766e; }
+
+        .item-sub {
+            font-size: 0.8rem;
+            color: var(--text-grey);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .storage-loc {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .expiry-info {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .expiry-info.red { color: var(--red-urgent); }
+        .expiry-info.amber { color: var(--gold-value); }
+        .expiry-info.green { color: var(--primary-dark); }
+
+        .consume-btn {
+            background: transparent;
+            border: 1.5px solid var(--light-green);
+            color: var(--primary-dark);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .consume-btn:hover {
+            background-color: var(--light-green);
+            color: var(--white);
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .empty-state img {
+            width: 240px;
+            height: auto;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .empty-sub {
+            font-size: 0.85rem;
+            color: var(--text-grey);
+            margin-top: 4px;
+            margin-bottom: 16px;
+        }
+
+        .add-first-btn {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .add-first-btn:hover {
+            background-color: #23543e;
+        }
+
+        /* SECTION 5 — AI SMART WASTE SAVER CARD */
+        .ai-card {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .ai-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 65%;
+            z-index: 2;
+        }
+
+        .ai-badge {
+            background-color: #c8e6c9;
+            color: var(--primary-dark);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .ai-headline {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .ai-sub {
+            font-size: 0.85rem;
+            color: var(--text-grey);
+        }
+
+        .recipe-btn {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: fit-content;
+            margin-top: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .recipe-btn:hover {
+            background-color: #23543e;
+        }
+
+        .ai-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 2;
+        }
+
+        .value-saved {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gold-value);
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* RECIPE MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: var(--white);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-grey);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            padding-right: 24px;
+        }
+
+        .modal-section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .ingredients-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 0.85rem;
+            color: var(--text-grey);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .steps-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+            font-size: 0.85rem;
+            color: var(--text-grey);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .cooked-btn {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 300;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================================
+        RESPONSIVE DESIGN
+        ========================================================= */
+
+        /* TABLET */
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-content {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+
+
+        /* =========================================================
+        MOBILE
+        ========================================================= */
+
+        @media (max-width: 768px) {
+
+            html,
+            body {
+                width: 100%;
+                min-width: 0;
+                overflow-x: hidden;
+            }
+
+            body {
+                display: block;
+            }
+
+            .app-container {
+                display: block;
+                width: 100%;
+                min-height: 100vh;
+            }
+
+
+            /* -----------------------------------------------------
+            BOTTOM NAVIGATION
+            ----------------------------------------------------- */
+
+            .sidebar {
+                width: 100%;
+                height: 64px;
+
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                top: auto;
+
+                padding: 4px 8px;
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+
+                background-color: var(--primary-dark);
+
+                box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.12);
+
+                z-index: 1000;
+
+                /* Helps on phones with a home indicator */
+                padding-bottom: env(safe-area-inset-bottom);
+                height: calc(64px + env(safe-area-inset-bottom));
+            }
+
+            .sidebar-top {
+                width: 100%;
+                height: 100%;
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+
+                gap: 0;
+            }
+
+            .sidebar-logo,
+            .user-profile {
+                display: none;
+            }
+
+            .nav-links {
+                width: 100%;
+                height: 100%;
+
+                display: flex;
+                flex-direction: row;
+
+                align-items: stretch;
+                justify-content: space-around;
+
+                gap: 4px;
+
+                list-style: none;
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .nav-item a {
+                width: 100%;
+                height: 100%;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                gap: 3px;
+
+                padding: 6px 4px;
+
+                color: rgba(255, 255, 255, 0.75);
+
+                font-size: 0.72rem;
+                font-weight: 500;
+
+                border-radius: 8px;
+
+                white-space: nowrap;
+            }
+
+            .nav-item a:hover {
+                background-color: transparent;
+            }
+
+            .nav-item.active a {
+                background-color: var(--light-green);
+                color: var(--text-dark);
+            }
+
+
+            /* -----------------------------------------------------
+            MAIN CONTENT
+            ----------------------------------------------------- */
+
+            .main-content {
+                width: 100%;
+                max-width: none;
+
+                margin: 0;
+
+                padding: 18px 16px;
+
+                /* Space for fixed bottom navigation */
+                padding-bottom: calc(92px + env(safe-area-inset-bottom));
+
+                display: flex;
+                flex-direction: column;
+
+                gap: 22px;
+
+                min-width: 0;
+            }
+
+
+            /* -----------------------------------------------------
+            TOP BAR
+            ----------------------------------------------------- */
+
+            .top-bar {
+                width: 100%;
+
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+
+                gap: 12px;
+
+                min-width: 0;
+            }
+
+            .greeting {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .greeting h1 {
+                font-size: 1.25rem;
+                line-height: 1.25;
+
+                word-break: normal;
+            }
+
+            .greeting p {
+                font-size: 0.76rem;
+                margin-top: 4px;
+            }
+
+            .top-bar-right {
+                flex-shrink: 0;
+
+                display: flex;
+                align-items: center;
+
+                gap: 8px;
+            }
+
+            .radar-badge {
+                max-width: 108px;
+
+                padding: 6px 9px;
+
+                font-size: 0.68rem;
+                line-height: 1.15;
+
+                text-align: left;
+            }
+
+            .notification-bell {
+                width: 36px;
+                height: 36px;
+
+                flex-shrink: 0;
+
+                font-size: 0.95rem;
+            }
+
+            .notif-dot {
+                top: 6px;
+                right: 6px;
+            }
+
+
+            /* -----------------------------------------------------
+            CONSUME FIRST BANNER
+            ----------------------------------------------------- */
+
+            .consume-banner {
+                width: 100%;
+                min-width: 0;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: stretch;
+                justify-content: flex-start;
+
+                gap: 12px;
+
+                padding: 14px 16px;
+
+                border-radius: 12px;
+            }
+
+            .banner-left {
+                width: 100%;
+                min-width: 0;
+
+                display: flex;
+                align-items: flex-start;
+
+                gap: 10px;
+            }
+
+            .banner-icon {
+                flex-shrink: 0;
+                font-size: 1.25rem;
+            }
+
+            .banner-title {
+                font-size: 0.9rem;
+            }
+
+            .banner-sub {
+                font-size: 0.72rem;
+                line-height: 1.35;
+            }
+
+            .urgent-chips {
+                width: 100%;
+                max-width: 100%;
+
+                display: flex;
+
+                overflow-x: auto;
+                overflow-y: hidden;
+
+                padding: 3px 0 5px;
+
+                gap: 8px;
+
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .urgent-chips::-webkit-scrollbar {
+                display: none;
+            }
+
+            .chip {
+                flex: 0 0 auto;
+
+                max-width: 85vw;
+
+                padding: 6px 10px;
+
+                font-size: 0.76rem;
+            }
+
+
+            /* -----------------------------------------------------
+            STATISTICS
+            ----------------------------------------------------- */
+
+            .stats-grid {
+                width: 100%;
+
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+
+                gap: 12px;
+            }
+
+            .stat-card {
+                min-width: 0;
+
+                padding: 14px;
+
+                border-radius: 10px;
+
+                gap: 5px;
+            }
+
+            .stat-label {
+                font-size: 0.72rem;
+            }
+
+            .stat-value {
+                font-size: 1.55rem;
+            }
+
+            .stat-sub {
+                font-size: 0.68rem;
+            }
+
+
+            /* -----------------------------------------------------
+            SEARCH + FILTERS
+            ----------------------------------------------------- */
+
+            .controls-row {
+                width: 100%;
+                min-width: 0;
+
+                gap: 12px;
+            }
+
+            .search-bar {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .search-bar input {
+                width: 100%;
+                min-width: 0;
+
+                padding: 11px 12px 11px 40px;
+
+                font-size: 0.85rem;
+            }
+
+            .search-icon {
+                left: 13px;
+                font-size: 0.9rem;
+            }
+
+            .filter-tabs {
+                width: 100%;
+
+                display: flex;
+
+                gap: 20px;
+
+                overflow-x: auto;
+                overflow-y: hidden;
+
+                white-space: nowrap;
+
+                -webkit-overflow-scrolling: touch;
+
+                scrollbar-width: none;
+            }
+
+            .filter-tabs::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tab-item {
+                flex: 0 0 auto;
+
+                padding-bottom: 9px;
+
+                font-size: 0.78rem;
+            }
+
+
+            /* -----------------------------------------------------
+            FOOD LIST
+            ----------------------------------------------------- */
+
+            .list-section {
+                width: 100%;
+                min-width: 0;
+
+                gap: 12px;
+            }
+
+            .list-header {
+                width: 100%;
+
+                gap: 10px;
+            }
+
+            .list-header h2 {
+                font-size: 1rem;
+            }
+
+            .sort-label {
+                font-size: 0.68rem;
+
+                white-space: nowrap;
+            }
+
+            .items-container {
+                width: 100%;
+                min-width: 0;
+
+                gap: 10px;
+            }
+
+
+            /* -----------------------------------------------------
+            FOOD CARD — MOBILE STACKED LAYOUT
+            ----------------------------------------------------- */
+
+            .food-card {
+                width: 100%;
+                min-width: 0;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: stretch;
+                justify-content: flex-start;
+
+                gap: 12px;
+
+                padding: 13px 12px;
+
+                border-left-width: 4px;
+
+                border-radius: 9px;
+            }
+
+            .card-left {
+                width: 100%;
+                min-width: 0;
+
+                display: flex;
+                align-items: center;
+
+                gap: 11px;
+            }
+
+            .food-emoji-bg {
+                width: 42px;
+                height: 42px;
+
+                flex: 0 0 42px;
+
+                font-size: 1.3rem;
+            }
+
+            .food-details {
+                min-width: 0;
+                flex: 1;
+
+                gap: 3px;
+            }
+
+            .title-row {
+                min-width: 0;
+
+                display: flex;
+                align-items: center;
+
+                gap: 6px;
+
+                flex-wrap: wrap;
+            }
+
+            .item-name {
+                min-width: 0;
+
+                font-size: 0.88rem;
+                line-height: 1.2;
+
+                overflow-wrap: anywhere;
+            }
+
+            .type-badge {
+                flex-shrink: 0;
+
+                font-size: 0.58rem;
+                padding: 2px 5px;
+            }
+
+            .item-sub {
+                min-width: 0;
+
+                display: flex;
+                align-items: center;
+
+                gap: 7px;
+
+                font-size: 0.68rem;
+
+                flex-wrap: wrap;
+
+                line-height: 1.25;
+            }
+
+            .storage-loc {
+                white-space: nowrap;
+            }
+
+
+            /* -----------------------------------------------------
+            EXPIRY + CONSUME BUTTON
+            ----------------------------------------------------- */
+
+            .card-right {
+                width: 100%;
+                min-width: 0;
+
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                gap: 8px;
+
+                padding-top: 2px;
+            }
+
+            .expiry-info {
+                min-width: 0;
+
+                font-size: 0.72rem;
+
+                text-align: left;
+
+                white-space: nowrap;
+            }
+
+            .consume-btn {
+                flex-shrink: 0;
+
+                padding: 6px 9px;
+
+                font-size: 0.68rem;
+
+                border-radius: 6px;
+            }
+
+
+            /* -----------------------------------------------------
+            EMPTY STATE
+            ----------------------------------------------------- */
+
+            .empty-state {
+                width: 100%;
+
+                padding: 28px 16px;
+            }
+
+            .empty-state img {
+                width: min(200px, 70vw);
+            }
+
+
+            /* -----------------------------------------------------
+            AI SMART WASTE SAVER
+            ----------------------------------------------------- */
+
+            .ai-card {
+                width: 100%;
+                min-width: 0;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 12px;
+
+                padding: 16px;
+
+                margin-top: 0;
+            }
+
+            .ai-left {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .ai-badge {
+                font-size: 0.62rem;
+            }
+
+            .ai-headline {
+                font-size: 0.95rem;
+                line-height: 1.3;
+            }
+
+            .ai-sub {
+                font-size: 0.74rem;
+                line-height: 1.4;
+            }
+
+            .recipe-btn {
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+
+            .ai-right {
+                width: 100%;
+            }
+
+            .value-saved {
+                font-size: 0.8rem;
+                padding: 7px 10px;
+            }
+
+
+            /* -----------------------------------------------------
+            MODAL
+            ----------------------------------------------------- */
+
+            .modal-overlay {
+                padding: 14px;
+            }
+
+            .modal-card {
+                width: 100%;
+                max-height: calc(100vh - 28px);
+
+                overflow-y: auto;
+
+                padding: 20px 18px;
+            }
+
+            .modal-title {
+                font-size: 1.05rem;
+            }
+
+            .ingredients-list,
+            .steps-list {
+                font-size: 0.78rem;
+            }
+
+
+            /* -----------------------------------------------------
+            TOAST
+            ----------------------------------------------------- */
+
+            .toast {
+                left: 16px;
+                right: 16px;
+
+                bottom: calc(78px + env(safe-area-inset-bottom));
+
+                text-align: center;
+
+                font-size: 0.78rem;
+
+                padding: 10px 14px;
+            }
+        }
+
+
+        /* =========================================================
+        VERY SMALL PHONES
+        ========================================================= */
+
+        @media (max-width: 380px) {
+
+            .main-content {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .greeting h1 {
+                font-size: 1.12rem;
+            }
+
+            .greeting p {
+                font-size: 0.68rem;
+            }
+
+            .radar-badge {
+                max-width: 88px;
+                font-size: 0.62rem;
+            }
+
+            .stats-grid {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 1.4rem;
+            }
+
+            .filter-tabs {
+                gap: 16px;
+            }
+
+            .food-card {
+                padding: 12px 10px;
+            }
+
+            .card-right {
+                align-items: flex-start;
+            }
+
+            .expiry-info {
+                white-space: normal;
+                line-height: 1.25;
+            }
+
+            .consume-btn {
+                font-size: 0.64rem;
+                padding: 6px 7px;
+            }
+
+            .nav-item a {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+<style id="kitchensense-unified-redesign">
+/* =========================================================
+   KitchenSense — unified application visual system
+   Matches the approved Add Item page.
+   Content, labels, links, IDs and JavaScript are preserved.
+   ========================================================= */
+:root{
+  --ks-forest-950:#09261a;
+  --ks-forest-900:#0d2f21;
+  --ks-forest-850:#103a29;
+  --ks-forest-800:#144632;
+  --ks-forest-700:#176044;
+  --ks-forest-600:#21805b;
+  --ks-mint-500:#55c79a;
+  --ks-mint-400:#7bd9b0;
+  --ks-mint-200:#c9f3df;
+  --ks-mint-100:#e9faf2;
+  --ks-cream:#f7faf8;
+  --ks-white:#fff;
+  --ks-ink:#14251f;
+  --ks-muted:#667a71;
+  --ks-line:#dfeae4;
+  --ks-red:#ef5b67;
+  --ks-amber:#e5a52d;
+  --ks-shadow-card:0 10px 28px rgba(18,52,38,.07);
+  --ks-shadow-soft:0 5px 16px rgba(18,52,38,.05);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ks-cream);min-height:100%}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 72% 8%,rgba(123,217,176,.10),transparent 25%),var(--ks-cream);color:var(--ks-ink);font-family:'Inter',sans-serif;overflow-x:hidden}
+button,input,select,textarea{font:inherit}
+img,svg{max-width:100%}
+a,button{-webkit-tap-highlight-color:transparent}
+.app-container{width:100%;min-height:100vh;display:block}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;z-index:100;width:295px!important;height:100vh!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;background:var(--ks-forest-900)!important;color:#fff!important;border-right:1px solid rgba(255,255,255,.05)!important;box-shadow:10px 0 28px rgba(8,35,24,.05)!important}
+.sidebar-top{display:flex!important;flex-direction:column!important;gap:0!important;min-width:0!important}
+.sidebar-logo{min-height:82px!important;padding:0 22px!important;display:flex!important;align-items:center!important;border-bottom:1px solid rgba(255,255,255,.08)!important}
+.sidebar-logo img{display:block!important;width:auto!important;max-width:205px!important;height:40px!important;object-fit:contain!important;filter:none!important}
+.nav-links{list-style:none!important;margin:0!important;padding:18px 12px 0!important;display:flex!important;flex-direction:column!important;gap:4px!important}
+.nav-item{min-width:0!important}
+.nav-item a{min-height:48px!important;width:100%!important;padding:11px 14px!important;display:flex!important;align-items:center!important;gap:12px!important;color:rgba(255,255,255,.78)!important;text-decoration:none!important;border-radius:12px!important;font-size:.92rem!important;font-weight:600!important;line-height:1.2!important;transition:background .2s ease,color .2s ease,transform .2s ease!important}
+.nav-item a:hover{background:rgba(85,199,154,.12)!important;color:#fff!important;transform:translateX(1px)!important}
+.nav-item.active a{color:#fff!important;background:linear-gradient(90deg,rgba(63,157,111,.68),rgba(63,157,111,.40))!important;box-shadow:inset 0 0 0 1px rgba(105,218,167,.32)!important;font-weight:700!important}
+.nav-item.active a::after{content:'›';margin-left:auto;font-size:1.25rem;line-height:1;color:#bdf1d9}
+.user-profile{margin:0!important;padding:15px 20px 20px!important;display:flex!important;align-items:center!important;gap:11px!important;border-top:1px solid rgba(255,255,255,.08)!important}
+.avatar-container{position:relative!important;flex:0 0 auto!important}
+.avatar{width:38px!important;height:38px!important;border-radius:11px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#21b77d!important;color:#fff!important;font-size:.82rem!important;font-weight:800!important;box-shadow:0 5px 16px rgba(33,183,125,.20)!important}
+.online-dot{position:absolute!important;right:-1px!important;bottom:-1px!important;width:10px!important;height:10px!important;border-radius:50%!important;background:#4ee39c!important;border:2px solid var(--ks-forest-900)!important}
+.user-info{display:flex!important;flex-direction:column!important;min-width:0!important}
+.user-name{color:#fff!important;font-size:.84rem!important;font-weight:700!important}
+.user-status{margin-top:2px!important;color:rgba(255,255,255,.58)!important;font-size:.72rem!important}
+.main-content{width:calc(100% - 295px)!important;min-height:100vh!important;margin-left:295px!important;padding:0 34px 34px!important;display:flex!important;flex-direction:column!important;gap:0!important;min-width:0!important}
+.toast{border-radius:11px!important;background:#123e2c!important;color:#fff!important;box-shadow:0 12px 30px rgba(10,42,28,.20)!important}
+
+/* shared responsive shell */
+@media (max-width:1100px){
+ .sidebar{width:245px!important}.main-content{width:calc(100% - 245px)!important;margin-left:245px!important;padding-left:26px!important;padding-right:26px!important}
+}
+@media (max-width:900px){
+ body{background:radial-gradient(circle at 100% 0%,rgba(123,217,176,.10),transparent 30%),var(--ks-cream)}
+ .sidebar{position:fixed!important;left:10px!important;right:10px!important;bottom:10px!important;top:auto!important;width:auto!important;height:68px!important;padding:7px 9px!important;border:1px solid rgba(113,211,169,.25)!important;border-radius:18px!important;background:rgba(13,47,33,.97)!important;box-shadow:0 12px 35px rgba(7,35,23,.24)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);flex-direction:row!important;justify-content:center!important}
+ .sidebar-top{width:100%!important;min-width:0!important;flex-direction:row!important;align-items:center!important}
+ .sidebar-logo,.user-profile{display:none!important}
+ .nav-links{width:100%!important;min-width:0!important;padding:0!important;flex-direction:row!important;align-items:stretch!important;justify-content:space-between!important;gap:4px!important}
+ .nav-item{flex:1 1 0!important;min-width:0!important}
+ .nav-item a{width:100%!important;min-width:0!important;min-height:52px!important;padding:6px 3px!important;border-radius:12px!important;flex-direction:column!important;justify-content:center!important;gap:3px!important;text-align:center!important;color:rgba(255,255,255,.76)!important;font-size:.66rem!important;line-height:1.1!important;white-space:normal!important;overflow:hidden!important}
+ .nav-item a span{display:block;max-width:100%;overflow-wrap:anywhere}
+ .nav-item.active a{background:rgba(77,188,141,.24)!important;box-shadow:inset 0 -2px 0 #62d7a4!important}
+ .nav-item.active a::after{display:none!important}
+ .main-content{width:100%!important;min-width:0!important;margin-left:0!important;padding:0 18px 98px!important}
+}
+@media (max-width:520px){
+ .main-content{padding-left:12px!important;padding-right:12px!important;padding-bottom:94px!important}
+ .sidebar{left:7px!important;right:7px!important;bottom:7px!important;height:63px!important;padding:5px 7px!important;border-radius:16px!important}
+ .nav-item a{min-height:51px!important;font-size:.61rem!important}
+}
+
+/* DASHBOARD */
+.top-bar{min-height:64px!important;margin:0 -34px!important;padding:0 34px!important;display:flex!important;justify-content:space-between!important;align-items:center!important;border-bottom:1px solid #e3ebe7!important;background:rgba(255,255,255,.72)!important;gap:20px!important}
+.greeting{min-width:0!important}.greeting h1{font-size:1.18rem!important;line-height:1.2!important;letter-spacing:-.02em!important;color:#12231d!important}.greeting p{margin-top:4px!important;font-size:.76rem!important;color:#6d7e76!important}
+.top-bar-right{display:flex!important;align-items:center!important;gap:12px!important;min-width:0!important}.radar-badge{display:flex!important;align-items:center!important;gap:8px!important;padding:8px 12px!important;border:1px solid #aee7cd!important;border-radius:999px!important;background:linear-gradient(135deg,#effbf5,#f8fcfa)!important;color:#176044!important;font-size:.73rem!important;font-weight:650!important}.pulse-dot{width:8px!important;height:8px!important;background:#22c55e!important;border-radius:50%!important;flex:0 0 auto!important}.notification-bell{width:42px!important;height:42px!important;border-radius:12px!important;border:1px solid #d9e5df!important;background:#fff!important;color:#18392c!important;box-shadow:none!important}
+.consume-banner{margin-top:24px!important;padding:15px 18px!important;border:1px solid #f2d0d0!important;border-radius:16px!important;background:linear-gradient(135deg,#fff7f7,#fffdf7)!important;box-shadow:var(--ks-shadow-soft)!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important}.banner-left{min-width:0!important;display:flex!important;align-items:center!important;gap:12px!important}.banner-title{font-size:.86rem!important}.banner-sub{font-size:.73rem!important}.urgent-chips{min-width:0!important}.chip{border-radius:999px!important;padding:6px 10px!important}
+.stats-grid{margin-top:18px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:13px!important}.stat-card{min-width:0!important;border:1px solid var(--ks-line)!important;border-radius:15px!important;padding:17px!important;background:#fff!important;box-shadow:var(--ks-shadow-soft)!important}.stat-label{font-size:.72rem!important;color:#708079!important}.stat-value{font-size:1.65rem!important;letter-spacing:-.025em!important}.stat-sub{font-size:.69rem!important;color:#82918b!important}
+.controls-row{margin-top:25px!important;gap:14px!important}.search-bar input{min-height:44px!important;border:1px solid #d8e4df!important;border-radius:12px!important;box-shadow:none!important;background:#fff!important}.search-bar input:focus{border-color:#55c79a!important;box-shadow:0 0 0 3px rgba(85,199,154,.12)!important}.filter-tabs{gap:22px!important;border-bottom:1px solid #dfeae4!important}.tab-item{padding-bottom:10px!important;font-size:.78rem!important}.tab-item.active::after{height:2px!important;background:#176044!important}.tab-count{border-radius:999px!important}
+.list-section{margin-top:24px!important;gap:13px!important}.list-header h2{font-size:1rem!important}.sort-label{font-size:.72rem!important}.items-container{gap:10px!important}.food-card{min-width:0!important;padding:13px 16px!important;border:1px solid #dfeae4!important;border-left-width:4px!important;border-radius:14px!important;background:#fff!important;box-shadow:var(--ks-shadow-soft)!important}.food-card:hover{transform:translateY(-1px)!important;box-shadow:var(--ks-shadow-card)!important}.food-emoji-bg{width:43px!important;height:43px!important;border-radius:12px!important;background:#f0faf5!important}.item-name{font-size:.84rem!important}.item-sub{font-size:.71rem!important}.expiry-info{font-size:.75rem!important}.consume-btn{border-radius:9px!important;padding:7px 11px!important;border-color:#9bd9bb!important;background:#f7fcf9!important}.ai-card{margin-top:24px!important;border:1px solid #b9ead2!important;border-radius:18px!important;background:linear-gradient(145deg,#f1fcf6,#e8f8f0)!important;box-shadow:var(--ks-shadow-card)!important;padding:20px!important}.ai-headline{font-size:1rem!important}.ai-sub{font-size:.72rem!important;color:#5f766b!important}.ai-badge{border-radius:999px!important;background:#dff5e9!important;color:#176044!important}
+.modal-overlay{background:rgba(7,35,23,.42)!important;backdrop-filter:blur(4px)}.modal-card{border:1px solid #cfe2d9!important;border-radius:20px!important;box-shadow:0 24px 70px rgba(7,35,23,.20)!important}
+@media(max-width:900px){
+ .top-bar{min-height:55px!important;margin:0 -18px!important;padding:0 18px!important}.greeting h1{font-size:1.02rem!important}.greeting p{font-size:.68rem!important}.radar-badge{max-width:145px!important;padding:7px 9px!important;font-size:.64rem!important}.notification-bell{width:38px!important;height:38px!important}.consume-banner{margin-top:17px!important;flex-direction:column!important;align-items:stretch!important}.banner-left{min-width:0!important}.urgent-chips{width:100%!important}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.stat-card{padding:14px!important}.controls-row{margin-top:20px!important}.filter-tabs{overflow-x:auto!important;white-space:nowrap!important;scrollbar-width:none!important}.filter-tabs::-webkit-scrollbar{display:none}.food-card{align-items:flex-start!important}.card-left{min-width:0!important;flex:1 1 auto!important}.card-right{flex:0 0 auto!important;gap:8px!important;align-items:flex-end!important;flex-direction:column!important}.title-row{flex-wrap:wrap!important}.ai-card{padding:17px!important}
+}
+@media(max-width:520px){.top-bar{margin:0 -12px!important;padding:0 12px!important}.greeting h1{font-size:.92rem!important}.greeting p{font-size:.64rem!important}.radar-badge{display:none!important}.notification-bell{width:36px!important;height:36px!important}.consume-banner{padding:13px!important}.banner-title{font-size:.79rem!important}.banner-sub{font-size:.68rem!important}.stats-grid{gap:8px!important}.stat-card{padding:12px!important;border-radius:13px!important}.stat-value{font-size:1.38rem!important}.list-header{align-items:flex-start!important;gap:8px!important}.food-card{padding:11px!important}.food-emoji-bg{width:38px!important;height:38px!important;font-size:1.25rem!important}.card-left{gap:10px!important}.item-name{font-size:.78rem!important}.item-sub{font-size:.64rem!important;flex-wrap:wrap!important;gap:6px!important}.card-right{width:100%!important;max-width:none!important;align-items:flex-end!important}.expiry-info{font-size:.67rem!important;text-align:right!important;white-space:normal!important;overflow-wrap:anywhere!important}.consume-btn{font-size:.63rem!important;padding:6px 8px!important;max-width:100%!important}.ai-card{margin-top:18px!important;border-radius:15px!important}}
+</style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="sidebar-logo">
+                    <img src="assets/logo-horizontal.png" alt="KitchenSense Logo">
+                </div>
+                <ul class="nav-links">
+                    <li class="nav-item active"><a href="dashboard.html">🏠 <span>Dashboard</span></a></li>
+                    <li class="nav-item"><a href="add-item.html">➕ <span>Add Item</span></a></li>
+                    <li class="nav-item"><a href="chat.html">💬 <span>AI Chat</span></a></li>
+                    <li class="nav-item"><a href="profile.html">👤 <span>Profile</span></a></li>
+                </ul>
+            </div>
+            <div class="user-profile">
+                <div class="avatar-container">
+                    <div class="avatar" id="sidebarAvatar">?</div>
+                    <div class="online-dot"></div>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="sidebarName">User</span>
+                    <span class="user-status">Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- TOP BAR -->
+            <header class="top-bar">
+                <div class="greeting">
+                    <h1 id="greetingText">Good morning! 👋</h1>
+                    <p id="todayDate"></p>
+                </div>
+                <div class="top-bar-right">
+                    <div class="radar-badge">
+                        <div class="pulse-dot"></div>
+                        <span>Live Kitchen Radar</span>
+                    </div>
+                    <div class="notification-bell">
+                        🔔
+                        <div class="notif-dot"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- SECTION 1 — CONSUME FIRST BANNER -->
+            <div class="consume-banner" id="consumeBanner">
+                <div class="banner-left">
+                    <span class="banner-icon">⚠️</span>
+                    <div>
+                        <div class="banner-title">Consume First</div>
+                        <div class="banner-sub">These items expire today or tomorrow</div>
+                    </div>
+                </div>
+                <div class="urgent-chips" id="urgentChipsContainer">
+                    <!-- Dynamic Urgent Chips -->
+                </div>
+            </div>
+
+            <!-- SECTION 2 — STATS ROW -->
+            <section class="stats-grid">
+                <div class="stat-card expiring">
+                    <span class="stat-label">Expiring Soon</span>
+                    <span class="stat-value" id="statExpiring">0</span>
+                    <span class="stat-sub">items ≤ 48 hrs</span>
+                </div>
+                <div class="stat-card good">
+                    <span class="stat-label">Good State</span>
+                    <span class="stat-value" id="statGood">0</span>
+                    <span class="stat-sub">safe items</span>
+                </div>
+                <div class="stat-card fresh">
+                    <span class="stat-label">Fresh Cooked</span>
+                    <span class="stat-value" id="statFresh">0</span>
+                    <span class="stat-sub">leftovers tracked</span>
+                </div>
+                <div class="stat-card saved">
+                    <span class="stat-label">Waste Saved</span>
+                    <span class="stat-value" id="statSaved">₹1,420</span>
+                    <span class="stat-sub">this month</span>
+                </div>
+            </section>
+
+            <!-- SECTION 3 — FILTER TABS + SEARCH -->
+            <section class="controls-row">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search masalas, dals, veggies..." oninput="handleSearch()">
+                </div>
+                <div class="filter-tabs">
+                    <div class="tab-item active" onclick="setFilter('ALL', this)">All Items <span class="tab-count" id="countAll">0</span></div>
+                    <div class="tab-item" onclick="setFilter('FRIDGE', this)">Refrigerator <span class="tab-count" id="countFridge">0</span></div>
+                    <div class="tab-item" onclick="setFilter('FREEZER', this)">Freezer <span class="tab-count" id="countFreezer">0</span></div>
+                    <div class="tab-item" onclick="setFilter('SHELF', this)">Dry Pantry <span class="tab-count" id="countPantry">0</span></div>
+                </div>
+            </section>
+
+            <!-- SECTION 4 — FOOD ITEMS LIST -->
+            <section class="list-section">
+                <div class="list-header">
+                    <h2>Priority Staples</h2>
+                    <span class="sort-label">Sorted: Soonest Expiry</span>
+                </div>
+                <div class="items-container" id="itemsContainer">
+                    <!-- Dynamic Food Cards -->
+                </div>
+            </section>
+
+            <!-- SECTION 5 — AI SMART WASTE SAVER CARD -->
+            <section class="ai-card" id="aiRecipeCard">
+                <div class="ai-left">
+                    <span class="ai-badge">✨ SMART WASTE SAVER</span>
+                    <div class="ai-headline" id="recipeHeadline">Loading AI suggestion...</div>
+                    <div class="ai-sub" id="recipeSub">Analysing your expiring items...</div>
+                    <button class="recipe-btn" onclick="openRecipeModal()">View Full Recipe →</button>
+                </div>
+                <div class="ai-right">
+                    <div class="value-saved" id="recipeItemCount">Fetching...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- RECIPE MODAL -->
+    <div class="modal-overlay" id="recipeModal">
+        <div class="modal-card">
+            <button class="close-modal" onclick="closeRecipeModal()">✕</button>
+            <div class="modal-title">Paneer Bhurji with Dal Parathas</div>
+            
+            <div>
+                <div class="modal-section-title">Ingredients Needed</div>
+                <ul class="ingredients-list">
+                    <li>200g Paneer (Mother Dairy vacuum pack)</li>
+                    <li>1 katori Cooked Dal Tadka</li>
+                    <li>1 cup Atta (Wheat flour)</li>
+                    <li>1 Finely chopped onion & tomato</li>
+                    <li>Basic spices (turmeric, chili, salt, cumin)</li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="modal-section-title">Instructions</div>
+                <ol class="steps-list">
+                    <li>Knead wheat flour using the leftover dal instead of water to make soft dough.</li>
+                    <li>Crumble paneer and sauté with onions, tomatoes, and spices for 5 minutes.</li>
+                    <li>Roll out parathas from the dal dough and cook on a tawa with ghee.</li>
+                    <li>Serve hot Paneer Bhurji with warm Dal Parathas!</li>
+                </ol>
+            </div>
+
+            <button class="cooked-btn" onclick="closeRecipeModal()">✓ Mark as Cooked</button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">✓ Item marked as consumed!</div>
+
+    <script>
+        /* SAMPLE DATA ARRAY
+           TODO: Replace with API call to GET /items?userId=user001
+        */
+        let itemsData = [];
+
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+
+        /* EMOJI LOGIC */
+        function getFoodEmoji(itemName) {
+            const name = itemName.toLowerCase();
+            if (name.includes('milk') || name.includes('doodh') || name.includes('dairy') ||
+                name.includes('paneer') || name.includes('curd') || name.includes('dahi') ||
+                name.includes('butter') || name.includes('ghee') || name.includes('cheese')) 
+                return '🥛';
+            if (name.includes('dal') || name.includes('sabzi') || name.includes('curry') || 
+                name.includes('cooked') || name.includes('rice') || name.includes('roti') ||
+                name.includes('subzi') || name.includes('sabji') || name.includes('bhat') || 
+                name.includes('chawal'))
+                return '🍲';
+            if (name.includes('tomato') || name.includes('tamatar') || name.includes('onion') || 
+                name.includes('pyaz') || name.includes('potato') || name.includes('aloo') ||
+                name.includes('carrot') || name.includes('gajar') || name.includes('spinach') || 
+                name.includes('palak') || name.includes('vegetable') || name.includes('sabzi') ||
+                name.includes('broccoli') || name.includes('cabbage') || name.includes('coriander'))
+                return '🥦';
+            if (name.includes('apple') || name.includes('banana') || name.includes('kela') || 
+                name.includes('mango') || name.includes('aam') || name.includes('fruit') ||
+                name.includes('orange') || name.includes('grapes') || name.includes('papaya'))
+                return '🍎';
+            if (name.includes('atta') || name.includes('flour') || name.includes('rice') || 
+                name.includes('chawal') || name.includes('grain') || name.includes('maida') ||
+                name.includes('suji') || name.includes('besan'))
+                return '🌾';
+            if (name.includes('egg') || name.includes('anda'))
+                return '🥚';
+            if (name.includes('biscuit') || name.includes('chips') || name.includes('snack') || 
+                name.includes('namkeen') || name.includes('cookie'))
+                return '🍪';
+            if (name.includes('chicken') || name.includes('fish') || name.includes('meat') || 
+                name.includes('mutton') || name.includes('prawn'))
+                return '🍗';
+            if (name.includes('bread') || name.includes('pav') || name.includes('roti') || 
+                name.includes('chapati'))
+                return '🍞';
+            return '🥘';
+        }
+
+        /* EXPIRY DISPLAY LOGIC */
+        function getExpiryDisplay(item) {
+            if (item.daysUntilExpiry < 0) {
+                return { text: "⛔ Expired", class: "red", border: "border-red" };
+            } else if (item.daysUntilExpiry === 0) {
+                return { text: "⚠ Expires Today", class: "red", border: "border-red" };
+            } else if (item.daysUntilExpiry === 1) {
+                return { text: "⏰ Expires Tomorrow", class: "amber", border: "border-amber" };
+            } else if (item.daysUntilExpiry === 2) {
+                return { text: "Expires in 2 days", class: "amber", border: "border-amber" };
+            } else {
+                return { text: `Safe • ${item.daysUntilExpiry} days left`, class: "green", border: "border-green" };
+            }
+        }
+
+        /* RENDER ITEMS */
+        function renderItems(items) {
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = '';
+
+            const filtered = items.filter(item => {
+                const matchesFilter = (currentFilter === 'ALL') || (item.storageLocation === currentFilter);
+                const matchesSearch = item.itemName.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <img src="assets/empty-state.png" alt="Empty Kitchen">
+                        <div class="empty-title">Your kitchen is empty!</div>
+                        <div class="empty-sub">Add your first food item to start tracking expiry</div>
+                        <a href="add-item.html" class="add-first-btn">Add First Item →</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by soonest expiry
+            filtered.sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry);
+
+            filtered.forEach(item => {
+                const expiry = getExpiryDisplay(item);
+                const emoji = getFoodEmoji(item.itemName);
+                
+                let typeBadgeClass = 'packaged';
+                let typeLabel = 'Packaged';
+                if (item.itemType === 'HOMEMADE') {
+                    typeBadgeClass = 'homemade';
+                    typeLabel = 'Homemade';
+                }
+
+                let locIcon = '❄️';
+                let locName = 'Fridge';
+                if (item.storageLocation === 'SHELF') {
+                    locIcon = '📦';
+                    locName = 'Pantry Shelf';
+                } else if (item.storageLocation === 'FREEZER') {
+                    locIcon = '🧊';
+                    locName = 'Freezer';
+                }
+
+                const cardHTML = `
+                    <div class="food-card ${expiry.border}">
+                        <div class="card-left">
+                            <div class="food-emoji-bg">${emoji}</div>
+                            <div class="food-details">
+                                <div class="title-row">
+                                    <span class="item-name">${item.itemName}</span>
+                                    <span class="type-badge ${typeBadgeClass}">${typeLabel}</span>
+                                </div>
+                                <div class="item-sub">
+                                    <span>${item.quantity}</span>
+                                    <span>•</span>
+                                    <span class="storage-loc">${locIcon} ${locName}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-right">
+                            <div class="expiry-info ${expiry.class}">${expiry.text}</div>
+                            <button class="consume-btn" onclick="consumeItem('${item.itemId}')">✓ Mark as Consumed</button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        /* UPDATE STATS & TAB COUNTS */
+        function updateStats(items) {
+            const expiringSoon = items.filter(i => i.daysUntilExpiry <= 2).length;
+            const goodState = items.filter(i => i.daysUntilExpiry > 2).length;
+            const freshCooked = items.filter(i => i.itemType === 'HOMEMADE').length;
+
+            document.getElementById('statExpiring').textContent = expiringSoon;
+            document.getElementById('statGood').textContent = goodState;
+            document.getElementById('statFresh').textContent = freshCooked;
+
+            // Tab Counts
+            document.getElementById('countAll').textContent = items.length;
+            document.getElementById('countFridge').textContent = items.filter(i => i.storageLocation === 'FRIDGE').length;
+            document.getElementById('countFreezer').textContent = items.filter(i => i.storageLocation === 'FREEZER').length;
+            document.getElementById('countPantry').textContent = items.filter(i => i.storageLocation === 'SHELF').length;
+        }
+
+        /* CONSUME FIRST BANNER */
+        function updateConsumeBanner() {
+            const urgentItems = itemsData.filter(i => i.consumeFirst && i.daysUntilExpiry >= 0);
+            const banner = document.getElementById('consumeBanner');
+            const chipsContainer = document.getElementById('urgentChipsContainer');
+
+            if (urgentItems.length === 0) {
+                banner.style.display = 'none';
+                return;
+            }
+
+            banner.style.display = 'flex';
+            chipsContainer.innerHTML = '';
+
+            urgentItems.forEach(item => {
+                const badgeClass = item.daysUntilExpiry === 0 ? 'today' : 'tomorrow';
+                const badgeText = item.daysUntilExpiry === 0 ? 'Today' : 'Tomorrow';
+                
+                chipsContainer.innerHTML += `
+                    <div class="chip">
+                        <span>${item.itemName}</span>
+                        <span class="chip-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                `;
+            });
+        }
+
+        /* CONSUME ITEM ACTION */
+        async function consumeItem(itemId) {
+            try {
+                await apiDeleteItem(itemId);
+
+                // Only remove the item from the UI after successful deletion
+                itemsData = itemsData.filter(i => i.itemId !== itemId);
+                renderItems(itemsData);
+                updateStats(itemsData);
+                updateConsumeBanner();
+                showToast();
+
+            } catch (e) {
+                console.error('Delete failed:', e);
+                alert('Failed to mark item as consumed. Please try again.');
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+
+        /* FILTER & SEARCH HANDLERS */
+        function setFilter(tab, element) {
+            currentFilter = tab;
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            renderItems(itemsData);
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderItems(itemsData);
+        }
+
+        /* RECIPE MODAL */
+        function openRecipeModal() {
+            document.getElementById('recipeModal').style.display = 'flex';
+        }
+
+        function closeRecipeModal() {
+            document.getElementById('recipeModal').style.display = 'none';
+        }
+
+        async function loadRecipeSuggestion() {
+            const fridgeStatus = localStorage.getItem('fridgeStatus') || 'standard';
+            try {
+                const data = await apiGetRecipe(fridgeStatus);
+                if (data.hasExpiring === false) {
+                    document.getElementById('recipeHeadline').textContent = 'Kitchen looks great!';
+                    document.getElementById('recipeSub').textContent = data.recipe;
+                    document.getElementById('recipeItemCount').textContent = 'Nothing expiring soon ✅';
+                } else {
+                    const fullText = data.recipe || '';
+                    const firstLine = fullText.split('\n')[0].replace('Recipe name:', '').trim();
+                    document.getElementById('recipeHeadline').textContent = firstLine || 'AI Recipe Suggestion';
+                    document.getElementById('recipeSub').textContent = fullText.substring(0, 120) + '...';
+                    document.getElementById('recipeItemCount').textContent = `Based on ${data.itemCount} expiring item(s)`;
+                    document.getElementById('recipeModal').querySelector('.modal-title').textContent = firstLine || 'AI Recipe';
+                    document.getElementById('recipeModal').querySelector('.ingredients-list').innerHTML = 
+                        '<li>See recipe steps below for full ingredient list</li>';
+                    document.getElementById('recipeModal').querySelector('.steps-list').innerHTML = `<li>${fullText.replace(/\n/g, '</li><li>')}</li>`;
+                }
+            } catch(e) {
+                document.getElementById('recipeHeadline').textContent = 'Could not load suggestion';
+                document.getElementById('recipeSub').textContent = 'Check your connection and try again.';
+                document.getElementById('recipeItemCount').textContent = '';
+            }
+        }
+
+        /* INITIALIZE */
+        document.addEventListener('DOMContentLoaded', async () => {
+            initializeSidebarUser();
+            const name = localStorage.getItem('userName') || 'there';
+            const hour = new Date().getHours();
+            const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+            document.getElementById('greetingText').textContent = `${greeting}, ${name}! 👋`;
+            document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            try {
+                const data = await apiGetItems();
+                if (Array.isArray(data)) {
+                    itemsData = data;
+                }
+            } catch (e) {
+                console.error('Failed to load items:', e);
+                document.getElementById('itemsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-title">⚠ Could not connect to server</div>
+                        <div class="empty-sub">Please check your connection and refresh the page.</div>
+                    </div>
+                `;
+                return;
+            }
+            renderItems(itemsData);
+            updateStats(itemsData);
+            updateConsumeBanner();
+            loadRecipeSuggestion();
+        });
+    </script>
+</body>
+</html>

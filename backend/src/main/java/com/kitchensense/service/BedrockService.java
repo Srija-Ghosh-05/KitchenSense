@@ -9,6 +9,8 @@ import software.amazon.awssdk.core.SdkBytes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,16 +45,17 @@ public class BedrockService {
     // maxTokenCount 512 is enough for a recipe suggestion without being wasteful.
     private String invokeModel(String prompt) {
         try {
-            // Escaping quotes properly so prompt strings don't break JSON structure
-            String escapedPrompt = prompt.replace("\\", "\\\\").replace("\"", "\\\"");
-            String requestBody = "{"
-                    + "\"inputText\": \"" + escapedPrompt + "\","
-                    + "\"textGenerationConfig\": {"
-                    + "\"maxTokenCount\": 512,"
-                    + "\"temperature\": 0.7,"
-                    + "\"topP\": 0.9"
-                    + "}"
-                    + "}";
+            // Build request body using ObjectMapper — handles all escaping automatically
+            Map<String, Object> requestMap = new HashMap<>();
+            requestMap.put("inputText", prompt);
+            
+            Map<String, Object> config = new HashMap<>();
+            config.put("maxTokenCount", 512);
+            config.put("temperature", 0.7);
+            config.put("topP", 0.9);
+            requestMap.put("textGenerationConfig", config);
+            
+            String requestBody = objectMapper.writeValueAsString(requestMap);
 
             InvokeModelRequest request = InvokeModelRequest.builder()
                     .modelId(MODEL_ID)

@@ -126,11 +126,11 @@ public class FoodItem {
     @JsonIgnore
     public boolean isExpiringSoon(int withinDays) {
         String effective = getEffectiveExpiry();
-        if (effective == null) {
-            return false;
-        }
+        if (effective == null) return false;
         LocalDate expiry = LocalDate.parse(effective);
-        LocalDate threshold = LocalDate.now().plusDays(withinDays);
-        return !expiry.isAfter(threshold);
+        LocalDate today = LocalDate.now();
+        LocalDate threshold = today.plusDays(withinDays);
+        // Only items that haven't expired yet but will within withinDays
+        return !expiry.isBefore(today) && !expiry.isAfter(threshold);
     }
 }
